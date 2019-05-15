@@ -1,0 +1,7 @@
+{
+  "API_VERSION": "v0",
+  "DB_USER": "root",
+  "DB_PASSWORD": "2009365",
+  "DB_NAME": "testgo",
+  "GOPATH": "/home/deus/projects/testgo/"
+}
