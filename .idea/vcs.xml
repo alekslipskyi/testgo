@@ -6,6 +6,8 @@
     <mapping directory="$PROJECT_DIR$/bin/runner/json.h" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bin/runner/jsoncpp" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bin/runner/rapidjson" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/runner/jsoncpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/lib/pq" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/lib/swagger-ui" vcs="Git" />
   </component>
 </project>

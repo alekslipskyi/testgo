@@ -19,7 +19,7 @@
       <ObjectId>24579</ObjectId>
       <StateNumber>559</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>569</IntrospectionStateNumber>
+      <IntrospectionStateNumber>579</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
       <Relations>sequence|table|24583|24585|1
@@ -111,7 +111,7 @@
       <Comment>standard public schema</Comment>
       <StateNumber>351</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>570</IntrospectionStateNumber>
+      <IntrospectionStateNumber>580</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
     </schema>
@@ -209,16 +209,16 @@
       <StateNumber>566</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="33" parent="29" name="first_name">
+    <column id="33" parent="29" name="firstname">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>566</StateNumber>
+      <StateNumber>575</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="34" parent="29" name="last_name">
+    <column id="34" parent="29" name="lastname">
       <Position>5</Position>
       <DataType>varchar(255)|0s</DataType>
-      <StateNumber>566</StateNumber>
+      <StateNumber>578</StateNumber>
       <TypeId>1043</TypeId>
     </column>
     <index id="35" parent="29" name="users__id_uindex">

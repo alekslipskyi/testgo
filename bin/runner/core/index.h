@@ -25,6 +25,7 @@ private:
     pid_t       pid;
     string      path_to_watch;
     string      path_to_watch_file;
+    bool        isReloadingProcess;
     bool        is_force_kill;
     void        error(string message);
     void        createProcess();

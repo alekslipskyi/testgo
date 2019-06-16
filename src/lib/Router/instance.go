@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-type middleware func(ctx Context) (bool, string)
+type middleware func(ctx *Context) (bool, interface{}, interface{})
 type Handler func(ctx Context)
 
 type Route struct {
@@ -48,7 +48,7 @@ func (instance *Instance) buildHandler(method string, url string, handler Handle
 	params := instance.findParams(url)
 
 	route := Route{handler, prefix, middleware, params}
-	routes[method+prefix+url] = route
+	routes[method+instance.getRoute(url, prefix)] = route
 }
 
 func (instance *Instance) findParams(url string) map[int]string {
@@ -75,4 +75,12 @@ func (instance *Instance) getPrefix() string {
 	}
 
 	return apiPrefix + instance.Prefix
+}
+
+func (instance *Instance) getRoute(url string, prefix string) string {
+	if url == "/" {
+		return prefix
+	}
+
+	return prefix + url
 }

@@ -7,19 +7,52 @@ info:
 schemes:
   - http
 basePath: /api/v0
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 paths:
-  /user/{id}:
+  /auth/token:
+    get:
+      tags: ["Auth"]
+      operationId: create
+      summary: Create test user
+      parameters:
+        - name: username
+          in: query
+        - name: password
+          in: query
+      responses:
+        '200':
+          description: created
+          schema:
+            $ref: "#/definitions/auth"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /list:
+    get:
+      tags: ["List"]
+      security:
+        - Bearer: []
+      summary: get list
+      responses:
+        '200':
+          description: list
+          schema:
+            $ref: "#/definitions/auth"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /user:
     post:
       tags: ["User"]
       operationId: create
       summary: Create test user
       parameters:
-        - name: id
-          in: path
-          description: id
-          required: true
-          schema:
-            type: string
         - name: info
           in: body
           schema:
@@ -57,6 +90,27 @@ definitions:
         type: string
         format: string
         minLength: 1
+  list:
+    type: object
+    properties:
+      title:
+        type: string
+        format: string
+      description:
+        type: string
+        format: string
+        minLength: 1
+      createdAt:
+        type: string
+        format: string
+  auth:
+    allOf:
+      - $ref: "#/definitions/user"
+      - type: object
+        properties:
+          token:
+            type: string
+            format: string
   social_id:
     type: object
     required:

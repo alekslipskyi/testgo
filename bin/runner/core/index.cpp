@@ -105,6 +105,8 @@ void Core::createProcess() {
 }
 
 void Core::reloadProcess(string path_to_watch, FileStatus status) {
+    cout << "hello";
+
     if(strlen(this->path_to_watch.c_str()) != 0 &&
        !filesystem::is_regular_file(filesystem::path(path_to_watch)) && status != FileStatus::erased) {
         return;

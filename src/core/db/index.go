@@ -1,22 +1,27 @@
 package db
 
 import (
-	"database/sql"
-	"fmt"
-	"os"
+	"core/db/create"
+	"core/db/find"
+	"core/db/types"
 )
 
 type Instance struct {
-	name string
+	Name  string
+	Model interface{}
 }
 
-var dbinfo = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-	os.Getenv("DB_USER"),
-	os.Getenv("DB_PASSWORD"),
-	os.Getenv("DB_NAME"))
+func (entity *Instance) Find(options types.QueryOptions) interface{} {
+	findInstance := find.SFind{entity.Name, entity.Model}
+	return findInstance.Find(options)
+}
 
-var connect, _ = sql.Open("postgres", dbinfo)
+func (entity *Instance) FindById(id int8, options types.QueryOptions) interface{} {
+	findInstance := find.SFind{entity.Name, entity.Model}
+	return findInstance.FindById(id, options)
+}
 
-func (instance *Instance) findById(id string) {
-	connect.QueryRow("SELECT * FROM $1", instance.name, id)
+func (entity *Instance) Create(data map[string]interface{}) interface{} {
+	createInstance := create.SCreate{entity.Name, entity.Model}
+	return createInstance.Create(data)
 }

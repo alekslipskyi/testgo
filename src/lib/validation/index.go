@@ -1,9 +1,9 @@
 package validation
 
 import (
-	"helpers/validation/constants"
-	"helpers/validation/types"
 	"lib/Router"
+	"lib/validation/constants"
+	"lib/validation/types"
 	"reflect"
 )
 
@@ -11,7 +11,7 @@ type (
 	MustBe map[string]interface{}
 )
 
-func getFieldFromCTX(in string, ctx Router.Context) (bool, map[string]interface{}) {
+func getFieldFromCTX(in string, ctx *Router.Context) (bool, map[string]interface{}) {
 	defaultParams := make(map[string]interface{})
 
 	switch in {
@@ -24,14 +24,14 @@ func getFieldFromCTX(in string, ctx Router.Context) (bool, map[string]interface{
 	}
 }
 
-func IsValid(in string, validBody MustBe) func(ctx Router.Context) (bool, string) {
-	return func(ctx Router.Context) (bool, string) {
+func IsValid(in string, validBody MustBe) func(ctx *Router.Context) (bool, interface{}, interface{}) {
+	return func(ctx *Router.Context) (bool, interface{}, interface{}) {
 		ok, data := getFieldFromCTX(in, ctx)
 
 		if ok {
 			for key := range data {
 				if validBody[key] == nil {
-					return false, key + constants.IsNotAllowed
+					return false, key + constants.IsNotAllowed, nil
 				}
 			}
 
@@ -42,7 +42,7 @@ func IsValid(in string, validBody MustBe) func(ctx Router.Context) (bool, string
 						number := types.Number{}
 						ok, errMessage := number.Validate(field, key, data[key])
 						if !ok {
-							return ok, errMessage
+							return ok, errMessage, nil
 						}
 					}
 				case reflect.TypeOf(types.String{}):
@@ -51,13 +51,13 @@ func IsValid(in string, validBody MustBe) func(ctx Router.Context) (bool, string
 						ok, errMessage := str.Validate(field, key, data[key])
 
 						if !ok {
-							return ok, errMessage
+							return ok, errMessage, nil
 						}
 					}
 				}
 			}
 		}
 
-		return true, "ok"
+		return true, "ok", nil
 	}
 }
