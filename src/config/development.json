@@ -3,5 +3,7 @@
   "DB_USER": "deus",
   "DB_PASSWORD": "2009365",
   "DB_NAME": "testgo",
-  "GOPATH": "/home/deus/projects/testgo/"
+  "GOPATH": "/home/deus/projects/testgo/",
+  "SECRET_KEY_FOR_PASSWORD": "qiWyR.Uj2mc0Cs21KA21321Sd<A/D}S",
+  "SECRET_KEY_FOR_TOKEN": "jasdxzc.asd1;121231asd!1/a@sd6sda/.128423aq.1"
 }

@@ -3,10 +3,11 @@ package crypto
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
+	"os"
 )
 
-var secretKey = []byte("qiWyR.Uj2mc0Cs21KA21321Sd<A/D}S")
+var secretKey = []byte(os.Getenv("SECRET_KEY_FOR_PASSWORD"))
+var secretToken = []byte(os.Getenv("SECRET_KEY_FOR_TOKEN"))
 
 func EncodeToken(token []byte, err interface{}) []byte {
 	if err != nil {
@@ -30,7 +31,6 @@ func DecodeToken(token []byte) []byte {
 	decodedToken := token
 
 	for key := range token {
-		fmt.Println(key)
 		if key%2 == 0 {
 			decodedToken[key] = decodedToken[key] - 2
 		} else if key%3 == 0 {

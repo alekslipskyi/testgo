@@ -13,10 +13,6 @@ type SFind struct {
 	Model interface{}
 }
 
-func (entity *SFind) FindById(id int8, options types.QueryOptions) interface{} {
-	return entity.Find(types.QueryOptions{})
-}
-
 func (entity *SFind) Find(options types.QueryOptions) interface{} {
 	sqlQuery, attributes := entity.generateQuery(options)
 

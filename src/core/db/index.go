@@ -18,7 +18,7 @@ func (entity *Instance) Find(options types.QueryOptions) interface{} {
 
 func (entity *Instance) FindById(id int8, options types.QueryOptions) interface{} {
 	findInstance := find.SFind{entity.Name, entity.Model}
-	return findInstance.FindById(id, options)
+	return findInstance.Find(options)
 }
 
 func (entity *Instance) Create(data map[string]interface{}) interface{} {

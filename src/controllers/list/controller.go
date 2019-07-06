@@ -11,5 +11,5 @@ type Controller struct {
 }
 
 func (controller *Controller) index(ctx Router.Context) {
-	fmt.Println(ctx.User)
+	fmt.Println("list are", ctx.User.ID)
 }

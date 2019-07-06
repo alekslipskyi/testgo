@@ -15,11 +15,7 @@ func getUserFromToken(token string) (bool, User.Token) {
 	var Json User.Token
 
 	decodedToken, _ := hex.DecodeString(token)
-	fmt.Println("test are:", decodedToken)
-
 	decodedJson := crypto.DecodeToken(decodedToken)
-
-	fmt.Println("test are:", decodedJson)
 
 	if err := json.Unmarshal(decodedJson, &Json); err != nil {
 		fmt.Println(err)
@@ -27,12 +23,10 @@ func getUserFromToken(token string) (bool, User.Token) {
 		return false, User.Token{}
 	}
 
-	return true, User.Token{}
+	return true, Json
 }
 
 func IsAuthenticated(ctx *Router.Context) (bool, interface{}, interface{}) {
-	fmt.Println("token", ctx.Req.Header.Get("Authorization"))
-
 	isValid, userData := getUserFromToken(ctx.Req.Header.Get("Authorization"))
 
 	if !isValid {
