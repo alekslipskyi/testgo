@@ -1,6 +1,6 @@
 package errors
 
-type RequestError struct {
+type IRequestError struct {
 	StatusCode int
 	Message    string
 	Token      string

@@ -4,8 +4,8 @@ import (
 	"./src/controllers/user"
 	"controllers/auth"
 	"controllers/list"
+	"core/Router"
 	"core/db/connect"
-	"lib/Router"
 	"log"
 	"net/http"
 )

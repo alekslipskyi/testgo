@@ -1,15 +1,17 @@
 package Router
 
 import (
+	"core/logger"
 	"encoding/json"
-	"fmt"
 	"helpers/errors"
 	"net/http"
 )
 
-type failedHandler func(error errors.RequestError)
-type sendJsonHandler func(json []byte, statusCode int)
+type failedHandler func(error errors.IRequestError)
+type sendJsonHandler func(model interface{}, statusCode int)
 type sendHandler func(message string, statusCode int)
+
+var logConn = logger.Logger{"Router Connection"}
 
 type connection struct {
 	closed bool
@@ -17,21 +19,23 @@ type connection struct {
 	r      *http.Request
 }
 
-func (conn *connection) sendJson(json []byte, statusCode int) {
+func (conn *connection) sendJson(model interface{}, statusCode int) {
 	if conn.closed {
-		fmt.Println("Warning: ", twiceCallError)
+		logConn.Warn(twiceCallError)
 		return
 	}
 	conn.closed = true
 	conn.w.WriteHeader(statusCode)
 	conn.w.Header().Set("Content-Type", "application/json")
 
-	_, _ = conn.w.Write(json)
+	payload, _ := json.Marshal(&model)
+
+	_, _ = conn.w.Write(payload)
 }
 
 func (conn *connection) send(message string, statusCode int) {
 	if conn.closed {
-		fmt.Println("Warning: ", twiceCallError)
+		logConn.Warn(twiceCallError)
 		return
 	}
 
@@ -41,10 +45,9 @@ func (conn *connection) send(message string, statusCode int) {
 	_, _ = conn.w.Write([]byte(message))
 }
 
-func (conn *connection) reject(error errors.RequestError) {
-	fmt.Println("failed")
+func (conn *connection) reject(error errors.IRequestError) {
 	if conn.closed {
-		fmt.Println("Warning: ", twiceCallError)
+		logConn.Warn(twiceCallError)
 		return
 	}
 	conn.closed = true

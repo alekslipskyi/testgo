@@ -12,7 +12,7 @@ func OmitPrivateFields(obj interface{}) {
 	for i := 0; i < sv.NumField(); i++ {
 		key := st.Field(i)
 
-		access := key.Tag.Get("access")
+		access := key.Tag.Get("json")
 		if access == "private" {
 			fieldValue := sv.Field(i)
 

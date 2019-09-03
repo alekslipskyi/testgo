@@ -1,14 +1,15 @@
 package validation
 
 import (
-	"lib/Router"
-	"lib/validation/constants"
-	"lib/validation/types"
+	"core/Router"
+	"core/validation/constants"
+	"core/validation/types"
 	"reflect"
 )
 
 type (
-	MustBe map[string]interface{}
+	MustBe      map[string]interface{}
+	MustBeOneOf map[string]interface{}
 )
 
 func getFieldFromCTX(in string, ctx *Router.Context) (bool, map[string]interface{}) {
@@ -24,18 +25,28 @@ func getFieldFromCTX(in string, ctx *Router.Context) (bool, map[string]interface
 	}
 }
 
-func IsValid(in string, validBody MustBe) func(ctx *Router.Context) (bool, interface{}, interface{}) {
+func IsValid(in string, schema interface{}) func(ctx *Router.Context) (bool, interface{}, interface{}) {
 	return func(ctx *Router.Context) (bool, interface{}, interface{}) {
 		ok, data := getFieldFromCTX(in, ctx)
+		var schemaBody map[string]interface{}
+
+		if reflect.TypeOf(schema) == reflect.TypeOf(MustBeOneOf{}) {
+			schemaBody = schema.(MustBeOneOf)
+			if len(data) == 0 {
+				return false, constants.OneOfShouldBe, nil
+			}
+		} else {
+			schemaBody = schema.(MustBe)
+		}
 
 		if ok {
 			for key := range data {
-				if validBody[key] == nil {
+				if schemaBody[key] == nil {
 					return false, key + constants.IsNotAllowed, nil
 				}
 			}
 
-			for key, field := range validBody {
+			for key, field := range schemaBody {
 				switch reflect.TypeOf(field) {
 				case reflect.TypeOf(types.Number{}):
 					{

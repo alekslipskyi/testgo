@@ -1,15 +1,16 @@
 package auth
 
 import (
+	"constants/requestError"
+	"core/Router"
 	"core/db/types"
-	"encoding/json"
+	"core/logger"
 	"helpers"
-	"helpers/errors"
-	"lib/Router"
-	"lib/crypto"
 	"models/User"
 	"net/http"
 )
+
+var log = logger.Logger{"controller AUTH"}
 
 type Controller struct{}
 
@@ -18,20 +19,21 @@ func (controller *Controller) handleAuth(ctx Router.Context) {
 		Where: types.Where{"username": ctx.Req.URL.Query().Get("username")},
 	})
 
-	if len(user.Password) == 0 || user.Password != crypto.GenerateHash(ctx.Req.URL.Query().Get("password")) {
-		requestError := errors.RequestError{
-			http.StatusNotFound,
-			"invalid credentials",
-			"INVALID_CREDENTIALS",
-		}
-		ctx.Reject(requestError)
+	if user.IsNotExist() || !user.IsValidPassword(ctx.Req.URL.Query().Get("password")) {
+		ctx.Reject(requestError.INVALID_CREDENTIAL)
 		return
 	}
 
+	log.Log("user", user)
+
 	helpers.OmitPrivateFields(&user)
+	if user.IsIPNotExist(ctx.RequestIP) {
+		if status := user.AddAllowIP(ctx.RequestIP); !status {
+			ctx.Reject(requestError.UNEXPECTED_ERROR)
+		}
+	}
+
 	user.GenerateToken()
 
-	payload, _ := json.Marshal(&user)
-
-	ctx.SendJson(payload, http.StatusOK)
+	ctx.SendJson(user, http.StatusOK)
 }

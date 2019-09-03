@@ -16,12 +16,14 @@ paths:
   /auth/token:
     get:
       tags: ["Auth"]
-      operationId: create
+      operationId: retrieveToken
       summary: Create test user
       parameters:
         - name: username
+          type: string
           in: query
         - name: password
+          type: string
           in: query
       responses:
         '200':
@@ -37,12 +39,85 @@ paths:
       tags: ["List"]
       security:
         - Bearer: []
-      summary: get list
+      summary: get lists
       responses:
         '200':
           description: list
           schema:
-            $ref: "#/definitions/auth"
+            $ref: "#/definitions/list"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    post:
+      tags: ["List"]
+      security:
+        - Bearer: []
+      summary: create list
+      parameters:
+        - name: info
+          in: body
+          schema:
+            $ref: "#/definitions/listToCreate"
+      responses:
+        '200':
+          description: list
+          schema:
+            $ref: "#/definitions/list"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /list/{id}:
+    get:
+      tags: ["List"]
+      security:
+        - Bearer: []
+      summary: get list by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+      responses:
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    patch:
+      tags: ["List"]
+      security:
+        - Bearer: []
+      summary: update list by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+        - name: info
+          in: body
+          schema:
+            $ref: "#/definitions/listToCreate"
+      responses:
+        '200':
+          description: list
+          schema:
+            $ref: "#/definitions/list"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    delete:
+      tags: ["List"]
+      security:
+        - Bearer: []
+      summary: delete list by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+      responses:
         default:
           description: error
           schema:
@@ -66,14 +141,47 @@ paths:
           description: error
           schema:
             $ref: "#/definitions/error"
+    put:
+      tags: ["User"]
+      security:
+        - Bearer: []
+      operationId: update
+      summary: Update user
+      parameters:
+        - name: info
+          in: body
+          schema:
+            $ref: "#/definitions/userToUpdate"
+      responses:
+        '200':
+          description: updated
+          schema:
+            $ref: "#/definitions/user"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    delete:
+      tags: ["User"]
+      security:
+        - Bearer: []
+      operationId: delete
+      summary: Delete user
+      responses:
+        '200':
+          description: ok
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
 definitions:
   user:
     type: object
     required:
-      - customerId
-      - name
-      - surname
-      - fipsCode
+      - username
+      - password
+      - firstName
+      - lastName
     properties:
       username:
         type: string
@@ -82,6 +190,20 @@ definitions:
         type: string
         format: string
         minLength: 1
+      firstName:
+        type: string
+        format: string
+        minLength: 1
+      lastName:
+        type: string
+        format: string
+        minLength: 1
+  userToUpdate:
+    type: object
+    properties:
+      username:
+        type: string
+        format: string
       firstName:
         type: string
         format: string
@@ -103,6 +225,13 @@ definitions:
       createdAt:
         type: string
         format: string
+  listToCreate:
+    type: object
+    properties:
+      title:
+        type: string
+      description:
+        type: string
   auth:
     allOf:
       - $ref: "#/definitions/user"
@@ -122,8 +251,6 @@ definitions:
         minLength: 11
   error:
     type: object
-    required:
-      - message
     properties:
       StatusCode:
         type: integer

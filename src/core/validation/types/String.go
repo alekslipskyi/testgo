@@ -1,7 +1,7 @@
 package types
 
 import (
-	"lib/validation/constants"
+	"core/validation/constants"
 	"strconv"
 )
 

@@ -12,6 +12,7 @@ type Handler func(ctx Context)
 type Route struct {
 	success    Handler
 	prefix     string
+	method     string
 	middleware []middleware
 	params     map[int]string
 }
@@ -47,7 +48,7 @@ func (instance *Instance) buildHandler(method string, url string, handler Handle
 	prefix := instance.getPrefix()
 	params := instance.findParams(url)
 
-	route := Route{handler, prefix, middleware, params}
+	route := Route{handler, prefix, method, middleware, params}
 	routes[method+instance.getRoute(url, prefix)] = route
 }
 

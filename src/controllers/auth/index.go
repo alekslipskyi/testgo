@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"lib/Router"
+	"core/Router"
 )
 
 func Routes() {

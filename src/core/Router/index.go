@@ -1,15 +1,20 @@
 package Router
 
 import (
+	"core/logger"
 	"encoding/json"
+	"fmt"
 	"helpers/errors"
 	"io"
 	"models/User"
 	"net/http"
 	"net/url"
 	"reflect"
+	"runtime"
 	"strings"
 )
+
+var log = logger.Logger{"ROUTER"}
 
 type New struct {
 	reject failedHandler
@@ -17,14 +22,15 @@ type New struct {
 }
 
 type Context struct {
-	Res      http.ResponseWriter
-	Req      *http.Request
-	Body     map[string]interface{}
-	Params   map[string]interface{}
-	Reject   failedHandler
-	SendJson sendJsonHandler
-	Send     sendHandler
-	User     User.Token
+	Res       http.ResponseWriter
+	Req       *http.Request
+	Body      map[string]interface{}
+	Params    map[string]interface{}
+	Reject    failedHandler
+	SendJson  sendJsonHandler
+	Send      sendHandler
+	User      User.Token
+	RequestIP string
 }
 
 func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
@@ -45,6 +51,7 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 			conn.sendJson,
 			conn.send,
 			User.Token{},
+			r.Header.Get("X-Real-IP"),
 		}
 
 		if !ok {
@@ -56,10 +63,10 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 				ok, errMessage, providedError := middleware(&ctx)
 
 				if !ok {
-					var requestError errors.RequestError
+					var requestError errors.IRequestError
 
-					if reflect.TypeOf(providedError) == reflect.TypeOf(errors.RequestError{}) {
-						requestError = providedError.(errors.RequestError)
+					if reflect.TypeOf(providedError) == reflect.TypeOf(errors.IRequestError{}) {
+						requestError = providedError.(errors.IRequestError)
 					} else {
 						message := commonMessageError
 
@@ -67,7 +74,7 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 							message = errMessage.(string)
 						}
 
-						requestError = errors.RequestError{http.StatusBadRequest, message, tokenNotValid}
+						requestError = errors.IRequestError{http.StatusBadRequest, message, tokenNotValid}
 					}
 
 					conn.reject(requestError)
@@ -76,6 +83,16 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		log.Debug("Receive request:", fmt.Sprintf("%s %s", r.Method, r.URL))
+
+		if len(ctx.Body) != 0 {
+			log.Debug("Body:", ctx.Body)
+		}
+
+		if len(ctx.Params) != 0 {
+			log.Debug("Params:", ctx.Params)
+		}
+		log.Debug("handler is", runtime.FuncForPC(reflect.ValueOf(handler.success).Pointer()).Name())
 		handler.success(ctx)
 	} else {
 		http.NotFound(w, r)
@@ -87,18 +104,27 @@ func (router *New) getRoute(method string, url string) (bool, Route, map[string]
 	var findedRoute Route
 
 	for route, routeParams := range routes {
+		log.Log(method + url)
+		log.Log(route)
+
 		if route == method+url {
 			return true, routeParams, params
 		}
 
-		routesParts := strings.Split(strings.Replace(url, routeParams.prefix, "", -1), "/")
+		parts := strings.Replace(url, routeParams.prefix, "", -1)
 
-		for i, param := range routeParams.params {
-			if len(routesParts[i+1]) != 0 {
-				params[param] = routesParts[i+1]
-				findedRoute = routeParams
-			} else {
-				return false, Route{}, params
+		if len(parts) != 0 {
+			routesParts := strings.Split(parts, "/")
+
+			for i, param := range routeParams.params {
+				if len(routesParts[i+1]) != 0 {
+					if method == routeParams.method {
+						params[param] = routesParts[i+1]
+						findedRoute = routeParams
+					}
+				} else {
+					return false, Route{}, params
+				}
 			}
 		}
 	}
@@ -118,8 +144,7 @@ func (router *New) parseBody(w http.ResponseWriter, r *http.Request, conn connec
 	if err == io.EOF {
 		return true, body
 	} else if err != nil {
-		println(err.Error())
-		requestError := errors.RequestError{http.StatusBadRequest, "json is not valid", "JSON_NOT_VALID"}
+		requestError := errors.IRequestError{http.StatusBadRequest, "json is not valid", "JSON_NOT_VALID"}
 
 		conn.reject(requestError)
 		return false, body

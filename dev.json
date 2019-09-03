@@ -1,0 +1,7 @@
+{
+  "exec": "clear && go run main.go",
+  "watchpath":  "./src",
+  "config": "./src/config/development.json",
+  "port": "8080",
+  "foreground": true
+}

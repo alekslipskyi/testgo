@@ -1,7 +1,8 @@
 package user
 
 import (
-	"lib/Router"
+	"core/Router"
+	"helpers/auth"
 )
 
 func Routes() {
@@ -11,4 +12,6 @@ func Routes() {
 	router := Router.Instance{Prefix: "/user"}
 
 	router.POST("/", controller.handleSignUp, checkBodySignUp)
+	router.PUT("/", controller.handleUpdate, checkBodyUpdate, auth.IsAuthenticated)
+	router.DELETE("/", controller.delete, auth.IsAuthenticated)
 }

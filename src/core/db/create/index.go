@@ -2,8 +2,11 @@ package create
 
 import (
 	"core/db/connect"
+	"core/db/converter"
+	"core/db/find"
+	"core/db/types"
+	"core/logger"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -12,39 +15,29 @@ type SCreate struct {
 	Model interface{}
 }
 
-func (entity *SCreate) Create(data map[string]interface{}) interface{} {
-	values, keys := entity.parseData(data)
+var log = logger.Logger{"create instance DB"}
 
-	fmt.Println(strings.Join(keys, ","))
-
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
+func (entity *SCreate) Create(data map[string]interface{}) int64 {
+	var ID int64
+	values, keys := converter.ParseData(data)
+	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING _id",
 		entity.Name,
 		strings.Join(keys, ","),
 		strings.Join(values, ","))
+	log.Debug("query:", query)
 
-	_, err := connect.DB.Exec(query)
+	err := connect.DB.QueryRow(query).Scan(&ID)
 
 	if err != nil {
-		return err
+		log.Error(err)
+		return 0
 	}
 
-	return nil
+	return ID
 }
 
-func (entity *SCreate) parseData(data map[string]interface{}) ([]string, []string) {
-	var values []string
-	var keys []string
-
-	for key, value := range data {
-		switch value.(type) {
-		case float64:
-			values = append(values, strconv.FormatFloat(value.(float64), 'f', 0, 64))
-		default:
-			values = append(values, fmt.Sprintf("'%s'", strings.ToLower(value.(string))))
-		}
-
-		keys = append(keys, strings.ToLower(key))
-	}
-
-	return values, keys
+func (entity *SCreate) CreateAndFind(data map[string]interface{}) interface{} {
+	id := entity.Create(data)
+	findInstance := find.SFind{entity.Name, entity.Model}
+	return findInstance.FindOne(types.QueryOptions{Where: types.Where{"_id": id}})
 }
