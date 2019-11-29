@@ -30,7 +30,7 @@ var USER_ALREADY_EXIST = errors.IRequestError{
 }
 
 var INVALID_CREDENTIAL = errors.IRequestError{
-	StatusCode: http.StatusNotFound,
+	StatusCode: http.StatusBadRequest,
 	Message:    "Invalid credentials",
 	Token:      "INVALID_CREDENTIALS",
 }
@@ -39,4 +39,10 @@ var NOT_FOUND = errors.IRequestError{
 	StatusCode: http.StatusNotFound,
 	Message:    "Not found",
 	Token:      "NOT_FOUND",
+}
+
+var SOMETHING_WENT_WRONG = errors.IRequestError{
+	StatusCode: http.StatusInternalServerError,
+	Message:    "Something went wrong",
+	Token:      "SOMETHING_WENT_WRONG",
 }

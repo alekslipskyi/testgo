@@ -36,9 +36,14 @@ func (entity *Instance) Drop(options types.QueryOptions) bool {
 	return dropInstance.Drop(options)
 }
 
-func (entity *Instance) Create(data map[string]interface{}) interface{} {
+func (entity *Instance) Create(data map[string]interface{}) (interface{}, error) {
 	createInstance := create.SCreate{entity.Name, entity.Model}
-	return createInstance.Create(data)
+	return createInstance.Create(data, false)
+}
+
+func (entity *Instance) CreateAndReturnID(data map[string]interface{}) (int64, error) {
+	createInstance := create.SCreate{entity.Name, entity.Model}
+	return createInstance.Create(data, true)
 }
 
 func (entity *Instance) CreateAndFind(data map[string]interface{}) interface{} {

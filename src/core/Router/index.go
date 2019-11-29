@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -38,6 +39,7 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 	requestURI.RawQuery = ""
 
 	exist, handler, params := router.getRoute(r.Method, requestURI.String())
+	log.Debug("handler is", runtime.FuncForPC(reflect.ValueOf(handler.success).Pointer()).Name())
 
 	if exist {
 		conn := connection{w: w, r: r}
@@ -92,11 +94,19 @@ func (router *New) EntryPoint(w http.ResponseWriter, r *http.Request) {
 		if len(ctx.Params) != 0 {
 			log.Debug("Params:", ctx.Params)
 		}
-		log.Debug("handler is", runtime.FuncForPC(reflect.ValueOf(handler.success).Pointer()).Name())
+
 		handler.success(ctx)
 	} else {
 		http.NotFound(w, r)
 	}
+}
+
+func (router *New) castToType(val interface{}) interface{} {
+	if parseVal, err := strconv.ParseInt(val.(string), 10, 64); err == nil {
+		return parseVal
+	}
+
+	return val
 }
 
 func (router *New) getRoute(method string, url string) (bool, Route, map[string]interface{}) {
@@ -104,26 +114,21 @@ func (router *New) getRoute(method string, url string) (bool, Route, map[string]
 	var findedRoute Route
 
 	for route, routeParams := range routes {
-		log.Log(method + url)
-		log.Log(route)
-
 		if route == method+url {
 			return true, routeParams, params
 		}
 
 		parts := strings.Replace(url, routeParams.prefix, "", -1)
 
-		if len(parts) != 0 {
+		if len(parts) != 0 && len(parts) != len(url) {
 			routesParts := strings.Split(parts, "/")
 
-			for i, param := range routeParams.params {
-				if len(routesParts[i+1]) != 0 {
+			for _, param := range routeParams.params {
+				if param.position <= len(routesParts) && len(routesParts[param.position]) != 0 {
 					if method == routeParams.method {
-						params[param] = routesParts[i+1]
+						params[param.name] = router.castToType(routesParts[param.position])
 						findedRoute = routeParams
 					}
-				} else {
-					return false, Route{}, params
 				}
 			}
 		}

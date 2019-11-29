@@ -14,7 +14,7 @@ var log = logger.Logger{"Auth Helper"}
 
 func getUserFromToken(token string) (bool, User.Token) {
 	var Json User.Token
-	log.Log(token)
+	log.Debug("received token: ", token)
 	if len(token) < 1 {
 		return false, User.Token{}
 	}
@@ -23,7 +23,7 @@ func getUserFromToken(token string) (bool, User.Token) {
 	decodedJson := crypto.DecodeToken(decodedToken)
 
 	if err := json.Unmarshal(decodedJson, &Json); err != nil {
-		log.Error(err)
+		log.Error("Error from decode token", err)
 
 		return false, User.Token{}
 	}

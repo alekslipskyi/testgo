@@ -4,6 +4,7 @@ import (
 	"core/Router"
 	"core/validation/constants"
 	"core/validation/types"
+	"fmt"
 	"reflect"
 )
 
@@ -14,6 +15,8 @@ type (
 
 func getFieldFromCTX(in string, ctx *Router.Context) (bool, map[string]interface{}) {
 	defaultParams := make(map[string]interface{})
+
+	fmt.Printf("asdas %s", ctx.Params)
 
 	switch in {
 	case "body":
@@ -29,6 +32,8 @@ func IsValid(in string, schema interface{}) func(ctx *Router.Context) (bool, int
 	return func(ctx *Router.Context) (bool, interface{}, interface{}) {
 		ok, data := getFieldFromCTX(in, ctx)
 		var schemaBody map[string]interface{}
+
+		isRequiredDefault := reflect.TypeOf(schema) == reflect.TypeOf(MustBe{})
 
 		if reflect.TypeOf(schema) == reflect.TypeOf(MustBeOneOf{}) {
 			schemaBody = schema.(MustBeOneOf)
@@ -51,7 +56,7 @@ func IsValid(in string, schema interface{}) func(ctx *Router.Context) (bool, int
 				case reflect.TypeOf(types.Number{}):
 					{
 						number := types.Number{}
-						ok, errMessage := number.Validate(field, key, data[key])
+						ok, errMessage := number.Validate(field, key, data[key], isRequiredDefault)
 						if !ok {
 							return ok, errMessage, nil
 						}
@@ -59,7 +64,7 @@ func IsValid(in string, schema interface{}) func(ctx *Router.Context) (bool, int
 				case reflect.TypeOf(types.String{}):
 					{
 						str := types.String{}
-						ok, errMessage := str.Validate(field, key, data[key])
+						ok, errMessage := str.Validate(field, key, data[key], isRequiredDefault)
 
 						if !ok {
 							return ok, errMessage, nil

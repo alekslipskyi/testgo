@@ -1,10 +1,16 @@
 package converter
 
+import "C"
 import (
+	"core/logger"
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 )
+
+var log = logger.Logger{"DB CONVERTER"}
 
 func ParseData(data map[string]interface{}) ([]string, []string) {
 	var values []string
@@ -69,4 +75,27 @@ func DataToQueryString(data map[string]interface{}, intermediateDelimiter, delim
 	}
 
 	return strings.Join(queryString, delimiter)
+}
+
+func CastToNeededType(val interface{}, modelPointer reflect.Value, property string) {
+	name := property
+
+	if strings.Contains(name, " AS ") {
+		name = strings.Split(name, " AS ")[1]
+	}
+
+	switch val.(type) {
+	default:
+		modelPointer.FieldByName(strings.Title(strings.ToLower(name))).Set(reflect.ValueOf(val))
+	case []uint8:
+		var arr []int64
+
+		err := json.Unmarshal([]byte(string(val.([]uint8))), &arr)
+
+		if err != nil {
+			log.Error(fmt.Sprintf("Error with casting type[%s] to array: %s", reflect.TypeOf(val), err))
+		}
+
+		modelPointer.FieldByName(strings.Title(strings.ToLower(name))).Set(reflect.ValueOf(arr))
+	}
 }

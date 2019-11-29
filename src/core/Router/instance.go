@@ -4,17 +4,22 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 )
 
 type middleware func(ctx *Context) (bool, interface{}, interface{})
 type Handler func(ctx Context)
+type Param struct {
+	position int
+	name     string
+}
 
 type Route struct {
 	success    Handler
 	prefix     string
 	method     string
 	middleware []middleware
-	params     map[int]string
+	params     map[int]Param
 }
 
 var routes = make(map[string]Route)
@@ -52,17 +57,28 @@ func (instance *Instance) buildHandler(method string, url string, handler Handle
 	routes[method+instance.getRoute(url, prefix)] = route
 }
 
-func (instance *Instance) findParams(url string) map[int]string {
-	params := make(map[int]string)
+func (instance *Instance) findParams(url string) map[int]Param {
+	params := make(map[int]Param)
+	var matchedPositions []int
 
 	reParams := regexp.MustCompile(`{\w+}`)
 	withoutBrackets := regexp.MustCompile(`[{}]`)
 
-	matchedParams := reParams.FindStringSubmatch(url)
+	matchedParams := reParams.FindAllString(url, -1)
+	allPosition := strings.Split(url, "/")
+
+	for pos, part := range allPosition {
+		if reParams.Match([]byte(part)) {
+			matchedPositions = append(matchedPositions, pos)
+		}
+	}
 
 	if len(matchedParams) != 0 {
 		for i, param := range matchedParams {
-			params[i] = withoutBrackets.ReplaceAllString(param, "")
+			params[i] = Param{
+				position: matchedPositions[i],
+				name:     withoutBrackets.ReplaceAllString(param, ""),
+			}
 		}
 	}
 

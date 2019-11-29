@@ -22,9 +22,11 @@ paths:
         - name: username
           type: string
           in: query
+          default: string
         - name: password
           type: string
           in: query
+          default: string
       responses:
         '200':
           description: created
@@ -131,12 +133,12 @@ paths:
         - name: info
           in: body
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/userToCreate"
       responses:
         '200':
           description: created
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/myUserData"
         default:
           description: error
           schema:
@@ -156,7 +158,7 @@ paths:
         '200':
           description: updated
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/myUserData"
         default:
           description: error
           schema:
@@ -174,8 +176,120 @@ paths:
           description: error
           schema:
             $ref: "#/definitions/error"
+    get:
+      tags: ["User"]
+      operationId: get
+      summary: get me
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: updated
+          schema:
+            $ref: "#/definitions/user"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /user/{id}:
+    get:
+      tags: ["User"]
+      operationId: get
+      summary: get user by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: updated
+          schema:
+            $ref: "#/definitions/user"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /channel:
+    get:
+      tags: ["Channel"]
+      security:
+        - Bearer: []
+      operationId: get
+      summary: get all channels
+      responses:
+        '200':
+          schema:
+            $ref: "#/definitions/channel"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    post:
+      tags: ["Channel"]
+      security:
+        - Bearer: []
+      operationId: create
+      summary: create channel
+      parameters:
+        - name: info
+          in: body
+          schema:
+            $ref: "#/definitions/channelToCreate"
+      responses:
+        '200':
+          description: ok
+          schema:
+            $ref: "#/definitions/channel"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /channel/{userID}/invite/{channelID}:
+    put:
+      tags: ["Channel"]
+      security:
+        - Bearer: []
+      operationId: invite
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: number
+        - name: channelID
+          in: path
+          schema:
+            type: number
+      summary: invite user to channel
+      responses:
+        '200':
+          schema:
+            $ref: "#/definitions/channels"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /channel/{channelID}:
+    delete:
+      tags: ["Channel"]
+      security:
+        - Bearer: []
+      operationId: channel_drop
+      parameters:
+        - name: channelID
+          in: path
+          schema:
+            type: number
+      summary: drop the channel
+      responses:
+        200:
+          description: ok
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
 definitions:
-  user:
+  userToCreate:
     type: object
     required:
       - username
@@ -198,6 +312,42 @@ definitions:
         type: string
         format: string
         minLength: 1
+  myUserData:
+    properties:
+      username:
+        type: string
+        format: string
+      ID:
+        type: number
+        format: number
+      firstName:
+        type: string
+        format: string
+        minLength: 1
+      lastName:
+        type: string
+        format: string
+        minLength: 1
+  user:
+    type: object
+    properties:
+      username:
+        type: string
+        format: string
+      firstName:
+        type: string
+        format: string
+        minLength: 1
+      lastName:
+        type: string
+        format: string
+        minLength: 1
+  channelToCreate:
+    type: object
+    properties:
+      name:
+        type: string
+        format: string
   userToUpdate:
     type: object
     properties:
@@ -225,6 +375,24 @@ definitions:
       createdAt:
         type: string
         format: string
+  channel:
+    type: object
+    properties:
+      id:
+        type: number
+        format: number
+      name:
+        type: string
+        format: string
+      user_ids:
+        type: array
+        items:
+          type: number
+          format: number
+  channels:
+    type: array
+    items:
+      $ref: "#/definitions/channel"
   listToCreate:
     type: object
     properties:
@@ -234,7 +402,7 @@ definitions:
         type: string
   auth:
     allOf:
-      - $ref: "#/definitions/user"
+      - $ref: "#/definitions/myUserData"
       - type: object
         properties:
           token:

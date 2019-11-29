@@ -28,7 +28,7 @@ func (entity *Controller) handleSignUp(ctx Router.Context) {
 		Where: types.Where{"username": ctx.Body["username"]},
 	})
 
-	if user.IsNotExist() {
+	if !user.IsNotExist() {
 		ctx.Reject(requestError.USER_ALREADY_EXIST)
 		return
 	}
@@ -36,20 +36,30 @@ func (entity *Controller) handleSignUp(ctx Router.Context) {
 	ctx.Body["password"] = crypto.GenerateHash(ctx.Body["password"].(string))
 
 	userCreated := User.CreateAndFind(ctx.Body)
-	userCreated.AddAllowIP(ctx.Req.Header.Get("X-Real-IP"))
+	userCreated.AddAllowIP(ctx.RequestIP)
 	userCreated.GenerateToken()
 
 	ctx.SendJson(userCreated, http.StatusCreated)
 }
 
-func (entity *Controller) delete(ctx Router.Context) {
-	user := User.FindById(ctx.User.ID, []string{"_id"})
+func (entity *Controller) getByID(ctx Router.Context) {
+	user := User.FindById(ctx.Params["userID"].(int64), []string{"_id", "firstname", "lastname", "username"})
 
 	if user.IsNotExist() {
 		ctx.Reject(requestError.NOT_FOUND)
 		return
 	}
 
+	ctx.SendJson(user, http.StatusOK)
+}
+
+func (entity *Controller) getMe(ctx Router.Context) {
+	user := User.FindById(ctx.User.ID, []string{"_id", "firstname", "lastname", "username"})
+	ctx.SendJson(user, http.StatusOK)
+}
+
+func (entity *Controller) delete(ctx Router.Context) {
+	user := User.FindById(ctx.User.ID, []string{"_id"})
 	user.Drop()
 	ctx.Send("ok", http.StatusOK)
 }

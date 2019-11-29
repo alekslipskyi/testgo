@@ -90,7 +90,7 @@ func (entity *SFind) PointToModel(result interface{}, maxColumns int, options ty
 			if property == "_id" {
 				modelPointer.FieldByName("ID").Set(reflect.ValueOf(*val))
 			} else {
-				modelPointer.FieldByName(strings.Title(strings.ToLower(property))).Set(reflect.ValueOf(*val))
+				converter.CastToNeededType(*val, modelPointer, property)
 			}
 		}
 	}
@@ -107,12 +107,27 @@ func (entity *SFind) generateQuery(options types.QueryOptions) (string, string) 
 		attributes = strings.Join(options.Attributes, ", ")
 	}
 
+	if len(options.Includes) != 0 {
+		for _, include := range options.Includes {
+			joinType := include.JoinType
+			if joinType == "" {
+				joinType = "LEFT"
+			}
+
+			sqlQuery += fmt.Sprintf("%s JOIN %s %s ON %s=%s ", joinType, include.TableName, include.AS, include.FkTableId, include.RefTableID)
+		}
+	}
+
 	if options.Where != nil {
 		Where = converter.DataToQueryString(options.Where, "=", "and")
 	}
 
 	if len(Where) != 0 {
 		sqlQuery += "WHERE" + Where
+	}
+
+	if len(options.GroupBy) != 0 {
+		sqlQuery += fmt.Sprintf("GROUP BY %s", strings.Join(options.GroupBy, ","))
 	}
 
 	return sqlQuery, attributes

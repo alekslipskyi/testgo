@@ -15,14 +15,14 @@ var log = logger.Logger{"User Model"}
 type StructUser struct {
 	ID        int64  `json:"id,omitempty"`
 	Username  string `json:"username,omitempty"`
-	Password  string `access:"private" json:"password,omitempty"`
-	FirstName string `json:"first_name,omitempty"`
-	LastName  string `json:"last_name,omitempty"`
+	Password  string `json:"-"`
+	Firstname string `json:"first_name,omitempty"`
+	Lastname  string `json:"last_name,omitempty"`
 }
 
 type User struct {
 	StructUser
-	Token string
+	Token string `json:"token,omitempty"`
 }
 
 type Token struct {
@@ -62,6 +62,7 @@ func (user *User) AddAllowIP(ip string) bool {
 	_, err := connect.DB.Query("insert into ip_users values ($1, $2)", ip, user.ID)
 
 	if err != nil {
+		log.Error("error from adding allow ip", err)
 		return false
 	}
 

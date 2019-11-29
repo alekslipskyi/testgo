@@ -6,18 +6,21 @@ import (
 )
 
 type Number struct {
-	Min      float64
-	Max      float64
+	Min      int64
+	Max      int64
 	Required bool
 }
 
-func (num *Number) Validate(field interface{}, key string, value interface{}) (bool, string) {
-	if value == nil {
+func (num *Number) Validate(field interface{}, key string, value interface{}, isRequiredDefault bool) (bool, string) {
+	associatedField, _ := field.(Number)
+
+	if value == nil && (associatedField.Required || isRequiredDefault) {
 		return false, key + constants.Required
+	} else if value == nil {
+		return true, "ok"
 	}
 
-	associatedField, _ := field.(Number)
-	associatedValue, ok := value.(float64)
+	associatedValue, ok := value.(int64)
 
 	if !ok {
 		return false, key + constants.WrongType + "number"

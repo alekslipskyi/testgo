@@ -11,12 +11,15 @@ type String struct {
 	Required bool
 }
 
-func (str *String) Validate(field interface{}, key string, value interface{}) (bool, string) {
-	if value == nil {
+func (str *String) Validate(field interface{}, key string, value interface{}, isRequiredDefault bool) (bool, string) {
+	associatedField, _ := field.(String)
+
+	if value == nil && (associatedField.Required || isRequiredDefault) {
 		return false, key + constants.Required
+	} else if value == nil {
+		return true, "ok"
 	}
 
-	associatedField, _ := field.(String)
 	associatedValue, ok := value.(string)
 
 	if !ok {
