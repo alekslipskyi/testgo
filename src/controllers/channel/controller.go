@@ -2,6 +2,7 @@ package channel
 
 import (
 	"constants/dbError"
+	"constants/permissions"
 	"constants/requestError"
 	"core/Router"
 	"core/db"
@@ -37,9 +38,10 @@ func (entity *Controller) create(ctx Router.Context) {
 		return
 	}
 
-	err = ChannelUsers.Create(map[string]interface{}{
-		"user_id":    ctx.Params["userID"].(int64),
-		"channel_id": ctx.Params["channelID"].(int64),
+	err2 := ChannelUsers.Create(map[string]interface{}{
+		"user_id":     ctx.User.ID,
+		"channel_id":  channelID,
+		"permissions": "rwdui",
 	})
 
 	channel := Channel.FindOne(types.QueryOptions{
@@ -51,16 +53,31 @@ func (entity *Controller) create(ctx Router.Context) {
 		GroupBy: types.GroupBy{"_id"},
 	})
 
-	if err != nil {
+	if err2 != nil && err2.Error() != dbError.NO_ROWS {
+		log.Debug("error from creating channel users", err2)
 		channel.Drop()
 		ctx.Reject(requestError.SOMETHING_WENT_WRONG)
+		return
 	}
 
 	ctx.SendJson(channel, http.StatusOK)
 }
 
 func (entity *Controller) drop(ctx Router.Context) {
-	log.Log("sdajskdskadja---")
+	channelUser := ChannelUsers.Find(types.QueryOptions{Where: types.Where{
+		"user_id":    ctx.User.ID,
+		"channel_id": ctx.Params["channelID"],
+	}})
+
+	if !channelUser.IsExist() {
+		ctx.Reject(requestError.NOT_FOUND)
+		return
+	}
+
+	if !channelUser.IsAllowed(permissions.DROP) {
+		ctx.Reject(NOT_ALLOWED_TO_DROP)
+		return
+	}
 
 	channel := Channel.FindOne(types.QueryOptions{
 		Attributes: types.Attributes{"_id"},
@@ -83,10 +100,14 @@ func (entity *Controller) drop(ctx Router.Context) {
 }
 
 func (entity *Controller) invite(ctx Router.Context) {
-	channelUser := ChannelUsers.Find(types.QueryOptions{Where: types.Where{
-		"user_id":    ctx.Params["userID"].(int64),
-		"channel_id": ctx.Params["channelID"].(int64),
-	}})
+	currentUser := ChannelUsers.FindOne(ctx.User.ID, ctx.Params["channelID"].(int64))
+
+	if !currentUser.IsAllowed(permissions.INVITE) {
+		ctx.Reject(NOT_ALLOWED_TO_INVITE)
+		return
+	}
+
+	channelUser := ChannelUsers.FindOne(ctx.Params["userID"].(int64), ctx.Params["channelID"].(int64))
 
 	if channelUser.IsExist() {
 		ctx.Reject(USER_ALREADY_INVITED)
@@ -99,9 +120,9 @@ func (entity *Controller) invite(ctx Router.Context) {
 	})
 
 	if err != nil && err.Error() != dbError.NO_ROWS {
-		ctx.Reject(USER_ID_IS_VALID)
+		ctx.Reject(requestError.NOT_FOUND)
 		return
 	}
 
-	entity.index(ctx)
+	ctx.Send("ok", http.StatusOK)
 }

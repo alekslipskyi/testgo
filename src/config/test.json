@@ -2,7 +2,7 @@
   "API_VERSION": "v0",
   "DB_USER": "deus",
   "DB_PASSWORD": "2009365",
-  "LOGGER_LEVEL": "NONE",
+  "LOGGER_LEVEL": "ERROR",
   "DB_NAME": "bomgatnik_test",
   "GOPATH": "/home/deus/projects/testgo",
   "SECRET_KEY_FOR_PASSWORD": "qiWyR.Uj2mc0Cs21KA21321Sd<A/D}S",

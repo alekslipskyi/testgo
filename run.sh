@@ -1,0 +1,1 @@
+runner_test "clear && go run main.go" ./ .go --config="./src/config/development.json" --port=8080

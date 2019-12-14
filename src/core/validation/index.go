@@ -4,7 +4,6 @@ import (
 	"core/Router"
 	"core/validation/constants"
 	"core/validation/types"
-	"fmt"
 	"reflect"
 )
 
@@ -15,8 +14,6 @@ type (
 
 func getFieldFromCTX(in string, ctx *Router.Context) (bool, map[string]interface{}) {
 	defaultParams := make(map[string]interface{})
-
-	fmt.Printf("asdas %s", ctx.Params)
 
 	switch in {
 	case "body":

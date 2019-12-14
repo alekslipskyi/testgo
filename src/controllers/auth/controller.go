@@ -19,6 +19,8 @@ func (controller *Controller) handleAuth(ctx Router.Context) {
 		Where: types.Where{"username": ctx.Req.URL.Query().Get("username")},
 	})
 
+	log.Debug("just test--", user.IsNotExist())
+
 	if user.IsNotExist() || !user.IsValidPassword(ctx.Req.URL.Query().Get("password")) {
 		ctx.Reject(requestError.INVALID_CREDENTIAL)
 		return

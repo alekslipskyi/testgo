@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"helpers/errors"
 	"net/http"
+	"reflect"
 )
 
 type failedHandler func(error errors.IRequestError)
@@ -29,6 +30,13 @@ func (conn *connection) sendJson(model interface{}, statusCode int) {
 	conn.w.Header().Set("Content-Type", "application/json")
 
 	payload, _ := json.Marshal(&model)
+
+	if string(payload) == "null" {
+		switch reflect.TypeOf(model).Kind() {
+		case reflect.Slice:
+			payload = []byte("[]")
+		}
+	}
 
 	_, _ = conn.w.Write(payload)
 }

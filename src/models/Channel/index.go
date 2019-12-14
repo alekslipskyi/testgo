@@ -54,6 +54,8 @@ func FindChannels(userId int64) []Channel {
 		channels = append(channels, channel)
 	}
 
+	log.Debug("result are----", channels)
+
 	return channels
 }
 

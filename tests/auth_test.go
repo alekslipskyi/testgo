@@ -1,24 +1,23 @@
 package tests
 
 import (
-	"../src"
 	"./utils"
 	"constants/requestError"
 	"core/crypto"
 	"core/db/connect"
-	"encoding/json"
 	"fmt"
 	. "github.com/smartystreets/goconvey/convey"
 	"models/User"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
 func TestSpec(t *testing.T) {
+	connect.Init()
 	Convey("Auth tests", t, func() {
-		srv := httptest.NewServer(router.Handler())
-		prefix := srv.URL + "/api/v0/auth"
+		connect.DB.Exec("delete from users")
+		requester := utils.Requester{}
+		requester.Init("/api/v0/auth", map[string]interface{}{})
 
 		createdUser := User.CreateAndFind(map[string]interface{}{
 			"firstName": "string",
@@ -29,9 +28,7 @@ func TestSpec(t *testing.T) {
 		createdUser.GenerateToken()
 
 		Convey("Login with right credentials should be successful and return a user object", func() {
-			res, _ := http.Get(fmt.Sprintf("%s/token?username=%s&password=%s", prefix, "string", "string"))
-			var responseBody map[string]interface{}
-			_ = json.NewDecoder(res.Body).Decode(&responseBody)
+			res, responseBody := requester.GET(fmt.Sprintf("/token?username=%s&password=%s", "string", "string"))
 
 			expectedBody := map[string]interface{}{
 				"id":         float64(createdUser.ID),
@@ -46,25 +43,17 @@ func TestSpec(t *testing.T) {
 		})
 
 		Convey("Login with wrong password should be failed and return an error", func() {
-			res, _ := http.Get(fmt.Sprintf("%s/token?username=%s&password=%s", prefix, "string", "string2"))
-
-			var responseBody map[string]interface{}
-			_ = json.NewDecoder(res.Body).Decode(&responseBody)
+			res, responseBody := requester.GET(fmt.Sprintf("/token?username=%s&password=%s", "string", "string2"))
 
 			So(res.StatusCode, ShouldEqual, http.StatusBadRequest)
 			So(responseBody, ShouldResemble, utils.StructToMap(requestError.INVALID_CREDENTIAL))
 		})
 
 		Convey("Login with wrong email should be failed and return an error", func() {
-			res, _ := http.Get(fmt.Sprintf("%s/token?username=%s&password=%s", prefix, "string2", "string"))
-
-			var responseBody map[string]interface{}
-			_ = json.NewDecoder(res.Body).Decode(&responseBody)
+			res, responseBody := requester.GET(fmt.Sprintf("/token?username=%s&password=%s", "string2", "string"))
 
 			So(res.StatusCode, ShouldEqual, http.StatusBadRequest)
 			So(responseBody, ShouldResemble, utils.StructToMap(requestError.INVALID_CREDENTIAL))
 		})
-
-		connect.DB.Exec("delete from users")
 	})
 }

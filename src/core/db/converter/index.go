@@ -22,12 +22,16 @@ func ParseData(data map[string]interface{}) ([]string, []string) {
 			values = append(values, strconv.FormatInt(value.(int64), 10))
 		case float64:
 			values = append(values, strconv.FormatFloat(value.(float64), 'f', 0, 64))
+		case bool:
+			values = append(values, strconv.FormatBool(value.(bool)))
 		default:
 			values = append(values, fmt.Sprintf("'%s'", strings.ToLower(value.(string))))
 		}
 
 		keys = append(keys, strings.ToLower(key))
 	}
+
+	log.Debug("finally values -> ", values)
 
 	return values, keys
 }

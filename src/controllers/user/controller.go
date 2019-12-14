@@ -65,8 +65,8 @@ func (entity *Controller) delete(ctx Router.Context) {
 }
 
 func (entity *Controller) handleUpdate(ctx Router.Context) {
-	user := User.FindById(ctx.User.ID, []string{"_id", "username"})
-	if user.ID == 0 {
+	user := User.FindById(ctx.User.ID, []string{"_id"})
+	if user.IsNotExist() {
 		ctx.Reject(requestError.UNAUTHORIZED)
 	}
 	ctx.SendJson(user.UpdateAndFind(ctx.Body), http.StatusCreated)
