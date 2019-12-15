@@ -74,7 +74,7 @@ func (entity *Controller) drop(ctx Router.Context) {
 		return
 	}
 
-	if !channelUser.IsAllowed(permissions.DROP) {
+	if !channelUser.HasPermission(permissions.DROP) {
 		ctx.Reject(NOT_ALLOWED_TO_DROP)
 		return
 	}
@@ -102,7 +102,7 @@ func (entity *Controller) drop(ctx Router.Context) {
 func (entity *Controller) invite(ctx Router.Context) {
 	currentUser := ChannelUsers.FindOne(ctx.User.ID, ctx.Params["channelID"].(int64))
 
-	if !currentUser.IsAllowed(permissions.INVITE) {
+	if !currentUser.HasPermission(permissions.INVITE) {
 		ctx.Reject(NOT_ALLOWED_TO_INVITE)
 		return
 	}

@@ -62,7 +62,7 @@ func (entity *SFind) FindMany(options types.QueryOptions) []interface{} {
 func (entity *SFind) PointToModel(result interface{}, maxColumns int, options types.QueryOptions) reflect.Value {
 	var log = logger.Logger{"DB FIND"}
 
-	modelPointer := entity.generateModelPointer()
+	modelPointer := converter.GenerateModelPointer(entity.Model)
 	pointers := entity.generatePointers(modelPointer, maxColumns)
 
 	var err error
@@ -87,7 +87,7 @@ func (entity *SFind) PointToModel(result interface{}, maxColumns int, options ty
 		for key, property := range options.Attributes {
 			val := pointers[key].(*interface{})
 
-			if property == "_id" {
+			if property == "_id" || (strings.Contains(property, "._id") && !strings.Contains(property, " as ")) {
 				modelPointer.FieldByName("ID").Set(reflect.ValueOf(*val))
 			} else {
 				converter.CastToNeededType(*val, modelPointer, property)
@@ -102,6 +102,10 @@ func (entity *SFind) generateQuery(options types.QueryOptions) (string, string) 
 	sqlQuery := "SELECT %s FROM %s "
 	attributes := "*"
 	var Where string
+
+	if len(options.AS) > 0 {
+		sqlQuery += fmt.Sprintf("AS %s ", options.AS)
+	}
 
 	if len(options.Attributes) != 0 {
 		attributes = strings.Join(options.Attributes, ", ")
@@ -131,11 +135,6 @@ func (entity *SFind) generateQuery(options types.QueryOptions) (string, string) 
 	}
 
 	return sqlQuery, attributes
-}
-
-func (entity *SFind) generateModelPointer() reflect.Value {
-	elem := reflect.ValueOf(entity.Model).Elem()
-	return reflect.Indirect(elem)
 }
 
 func (entity *SFind) generatePointers(modelPointer reflect.Value, maxColumns int) []interface{} {

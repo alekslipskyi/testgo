@@ -52,6 +52,11 @@ func isStringType(value string) bool {
 	return true
 }
 
+func GenerateModelPointer(model interface{}) reflect.Value {
+	elem := reflect.ValueOf(model).Elem()
+	return reflect.Indirect(elem)
+}
+
 func castToString(val interface{}) string {
 	switch val.(type) {
 	case int64:
@@ -84,22 +89,40 @@ func DataToQueryString(data map[string]interface{}, intermediateDelimiter, delim
 func CastToNeededType(val interface{}, modelPointer reflect.Value, property string) {
 	name := property
 
-	if strings.Contains(name, " AS ") {
-		name = strings.Split(name, " AS ")[1]
+	if strings.Contains(strings.ToLower(name), " as ") {
+		name = strings.Split(strings.ToLower(name), " as ")[1]
+	}
+
+	if strings.Contains(name, ".") {
+		name = strings.Split(name, ".")[1]
+	}
+
+	if strings.Contains(name, "_") {
+		name = strings.Replace(name, "_", "", -1)
 	}
 
 	switch val.(type) {
 	default:
 		modelPointer.FieldByName(strings.Title(strings.ToLower(name))).Set(reflect.ValueOf(val))
 	case []uint8:
-		var arr []int64
+		field := modelPointer.FieldByName(strings.Title(strings.ToLower(name)))
+		switch field.Type().String() {
+		case "[]int64":
+			var arr []int64
+			err := json.Unmarshal([]byte(string(val.([]uint8))), &arr)
+			log.LogOnError(err, fmt.Sprintf("Error with casting type[%s] to array: %s", reflect.TypeOf(val), err))
 
-		err := json.Unmarshal([]byte(string(val.([]uint8))), &arr)
+			field.Set(reflect.ValueOf(arr))
+		case "map[string]interface {}":
+			var arr map[string]interface{}
+			err := json.Unmarshal([]byte(string(val.([]uint8))), &arr)
+			log.LogOnError(err, fmt.Sprintf("Error with casting type[%s] to array: %s", reflect.TypeOf(val), err))
 
-		if err != nil {
-			log.Error(fmt.Sprintf("Error with casting type[%s] to array: %s", reflect.TypeOf(val), err))
+			field.Set(reflect.ValueOf(arr))
+		default:
+			log.Error("unsupported type for casting ---> ", field.Type().String())
 		}
 
-		modelPointer.FieldByName(strings.Title(strings.ToLower(name))).Set(reflect.ValueOf(arr))
+	case nil:
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"controllers/auth"
 	"controllers/channel"
 	"controllers/list"
+	"controllers/messages"
 	"controllers/user"
 	"core/Router"
 	"core/db/connect"
@@ -20,6 +21,7 @@ func Handler() http.Handler {
 	auth.Routes()
 	list.Routes()
 	channel.Routes()
+	messages.Routes()
 
 	handler.HandleFunc("/", router.EntryPoint)
 

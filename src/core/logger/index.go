@@ -39,6 +39,19 @@ func (logger *Logger) Error(data ...interface{}) {
 	}
 }
 
+func (logger *Logger) LogOnError(err error, message interface{}) {
+	if err != nil {
+		logger.Error(message)
+	}
+}
+
+func (logger *Logger) FailOnerror(err error, data ...interface{}) {
+	if err != nil {
+		logger.Error(err, data[0])
+		os.Exit(1)
+	}
+}
+
 func (logger *Logger) Debug(data ...interface{}) {
 	if logger.isModeAllowed(ALL) {
 		fmt.Println(fmt.Errorf("[%s] debug:", logger.Context), data)

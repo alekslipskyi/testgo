@@ -210,6 +210,26 @@ paths:
           description: error
           schema:
             $ref: "#/definitions/error"
+  /message/{channelID}/messages:
+    get:
+      tags: ["Messages"]
+      security:
+        - Bearer: []
+      parameters:
+        - name: channelID
+          in: path
+          schema:
+            type: number
+      operationId: get
+      summary: get all messages related to provided channel id from param channelID
+      responses:
+        '200':
+          schema:
+            $ref: "#/definitions/channel"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
   /channel:
     get:
       tags: ["Channel"]

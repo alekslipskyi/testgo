@@ -16,7 +16,7 @@ func (channelUser *ChannelUsers) IsExist() bool {
 	return channelUser.UserId != 0
 }
 
-func (channelUser *ChannelUsers) IsAllowed(operation rune) bool {
+func (channelUser *ChannelUsers) HasPermission(operation rune) bool {
 	return strings.Contains(channelUser.Permissions, string(operation))
 }
 

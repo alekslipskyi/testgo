@@ -18,4 +18,5 @@ type QueryOptions struct {
 	Where      Where
 	Includes   []Include
 	GroupBy    GroupBy
+	AS         string
 }
