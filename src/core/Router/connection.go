@@ -12,7 +12,7 @@ type failedHandler func(error errors.IRequestError)
 type sendJsonHandler func(model interface{}, statusCode int)
 type sendHandler func(message string, statusCode int)
 
-var logConn = logger.Logger{"Router Connection"}
+var logConn = logger.Logger{Context: "Router Connection"}
 
 type connection struct {
 	closed bool

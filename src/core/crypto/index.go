@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var log = logger.Logger{"CRYPTO"}
+var log = logger.Logger{Context: "CRYPTO"}
 var secretKey = []byte(os.Getenv("SECRET_KEY_FOR_PASSWORD"))
 var secretToken = []byte(os.Getenv("SECRET_KEY_FOR_TOKEN"))
 

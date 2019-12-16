@@ -10,7 +10,7 @@ import (
 	"models/User"
 )
 
-var log = logger.Logger{"Auth Helper"}
+var log = logger.Logger{Context: "Auth Helper"}
 
 func getUserFromToken(token string) (bool, User.Token) {
 	var Json User.Token

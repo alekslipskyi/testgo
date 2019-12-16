@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 )
 
-var log = logger.Logger{"User Model"}
+var log = logger.Logger{Context: "User Model"}
 
 type StructUser struct {
 	ID        int64  `json:"id,omitempty"`

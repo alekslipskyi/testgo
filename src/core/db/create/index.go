@@ -1,6 +1,7 @@
 package create
 
 import (
+	"constants/dbError"
 	"core/db/connect"
 	"core/db/converter"
 	"core/db/find"
@@ -15,7 +16,7 @@ type SCreate struct {
 	Model interface{}
 }
 
-var log = logger.Logger{"create instance DB"}
+var log = logger.Logger{Context: "create instance DB"}
 
 func (entity *SCreate) Create(data map[string]interface{}, isReturnID bool) (int64, error) {
 	var ID int64
@@ -36,7 +37,9 @@ func (entity *SCreate) Create(data map[string]interface{}, isReturnID bool) (int
 	err := connect.DB.QueryRow(query).Scan(&ID)
 
 	if err != nil {
-		log.Error(err)
+		if err.Error() != dbError.NO_ROWS {
+			log.Error(err)
+		}
 		return 0, err
 	}
 

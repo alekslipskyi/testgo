@@ -10,7 +10,7 @@ func Routes() {
 	controller := Controller{}
 	controller.Init()
 
-	router.DELETE("/{channelID}", controller.drop, auth.IsAuthenticated)
+	router.DELETE("/{channelID}", controller.drop, auth.IsAuthenticated, paramsChannelDrop)
 
 	router.GET("/", controller.index, auth.IsAuthenticated)
 	router.POST("/", controller.create, auth.IsAuthenticated, bodyChannelCreate)

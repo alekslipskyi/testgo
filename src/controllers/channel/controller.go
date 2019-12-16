@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-var log = logger.Logger{"controller channel"}
+var log = logger.Logger{Context: "controller channel"}
 
 type Controller struct {
 	channelUsers db.Instance

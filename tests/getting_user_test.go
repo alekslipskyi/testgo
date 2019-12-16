@@ -4,6 +4,7 @@ import (
 	"./utils"
 	"core/crypto"
 	"core/db/connect"
+	"core/logger"
 	. "github.com/smartystreets/goconvey/convey"
 	"helpers/errors"
 	"models/User"
@@ -13,6 +14,7 @@ import (
 
 func TestGettingUserSpec(t *testing.T) {
 	Convey("Test getting user spec", t, func() {
+		var log = logger.Logger{Context: "getting user tests", Colors: logger.Colors{Info: logger.GREEN}}
 		connect.DB.Exec("delete from users")
 
 		requester := utils.Requester{}
@@ -28,6 +30,7 @@ func TestGettingUserSpec(t *testing.T) {
 		createdUser.GenerateToken()
 
 		Convey("Getting user should return user", func() {
+			log.Info("Getting user should return user")
 			res, responseBody := requester.GET(createdUser.ID)
 
 			expectedBody := map[string]interface{}{
@@ -42,6 +45,7 @@ func TestGettingUserSpec(t *testing.T) {
 		})
 
 		Convey("Getting user with param id as string should fail", func() {
+			log.Info("Getting user with param id as string should fail")
 			res, responseBody := requester.GET("test")
 
 			expectedError := utils.StructToMap(errors.IRequestError{http.StatusBadRequest, "userID must be a number", "NOT_VALID"})

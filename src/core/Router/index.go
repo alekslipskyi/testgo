@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-var log = logger.Logger{"ROUTER"}
+var log = logger.Logger{Context: "ROUTER"}
 
 type New struct {
 	reject failedHandler

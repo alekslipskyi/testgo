@@ -5,6 +5,12 @@ import (
 	"net/http"
 )
 
+var CHANNEL_NOT_FOUND = errors.IRequestError{
+	StatusCode: http.StatusNotFound,
+	Message:    "Channel doesn't exist",
+	Token:      "CHANNEL_NOT_FOUND",
+}
+
 var CHANNEL_ALREADY_EXISTS = errors.IRequestError{
 	StatusCode: http.StatusBadRequest,
 	Message:    "Channel already exists",

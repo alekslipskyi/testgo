@@ -5,6 +5,7 @@ import (
 	"constants/requestError"
 	"core/crypto"
 	"core/db/connect"
+	"core/logger"
 	. "github.com/smartystreets/goconvey/convey"
 	"helpers/errors"
 	"models/User"
@@ -13,6 +14,8 @@ import (
 )
 
 func TestUpdateUserSpec(t *testing.T) {
+	var log = logger.Logger{Context: "update user tests", Colors: logger.Colors{Info: logger.GREEN}}
+
 	Convey("Update user tests", t, func() {
 		connect.DB.Exec("delete from users")
 
@@ -37,6 +40,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		}
 
 		Convey("Update user should be successful and return updated user", func() {
+			log.Info("Update user should be successful and return updated user")
 			res, responseBody := requester.PUT(userToUpdate)
 
 			expectedBody := map[string]interface{}{
@@ -51,6 +55,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		})
 
 		Convey("Update user with additional unauthorized filed \"test\" should be failed and return error \"test is not allowed\"", func() {
+			log.Info("Update user with additional unauthorized filed \"test\" should be failed and return error \"test is not allowed\"")
 			userToUpdate := map[string]interface{}{
 				"firstName": "updated",
 				"lastName":  "updated",
@@ -67,6 +72,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		})
 
 		Convey("Update only firstName should be successful and return user with updated firstName", func() {
+			log.Info("Update only firstName should be successful and return user with updated firstName")
 			userToUpdate := map[string]interface{}{
 				"firstName": "updated",
 			}
@@ -85,6 +91,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		})
 
 		Convey("Update only lastName should be successful and return user with updated lastName", func() {
+			log.Info("Update only lastName should be successful and return user with updated lastName")
 			userToUpdate := map[string]interface{}{
 				"lastName": "updated",
 			}
@@ -103,6 +110,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		})
 
 		Convey("Update with empty body should be failed and return user with error \"One of fields should be provided\"", func() {
+			log.Info("Update with empty body should be failed and return user with error \"One of fields should be provided\"")
 			userToUpdate := map[string]interface{}{}
 
 			res, responseBody := requester.PUT(userToUpdate)
@@ -114,6 +122,7 @@ func TestUpdateUserSpec(t *testing.T) {
 		})
 
 		Convey("Update user without providing auth header should be failed and return UNAUTHORIZED error", func() {
+			log.Info("Update user without providing auth header should be failed and return UNAUTHORIZED error")
 			requester.UnsetAuth()
 			res, responseBody := requester.PUT(userToUpdate)
 

@@ -1,6 +1,7 @@
 package find
 
 import (
+	"constants/dbError"
 	"core/db/connect"
 	"core/db/converter"
 	"core/db/types"
@@ -17,7 +18,7 @@ type SFind struct {
 }
 
 func (entity *SFind) FindOne(options types.QueryOptions) interface{} {
-	var log = logger.Logger{"DB FIND ONE"}
+	var log = logger.Logger{Context: "DB FIND ONE"}
 
 	maxColumns := len(options.Attributes)
 	sqlQuery, attributes := entity.generateQuery(options)
@@ -33,7 +34,7 @@ func (entity *SFind) FindOne(options types.QueryOptions) interface{} {
 }
 
 func (entity *SFind) FindMany(options types.QueryOptions) []interface{} {
-	var log = logger.Logger{"DB FIND MANY"}
+	var log = logger.Logger{Context: "DB FIND MANY"}
 
 	maxColumns := len(options.Attributes)
 	var result []interface{}
@@ -60,7 +61,7 @@ func (entity *SFind) FindMany(options types.QueryOptions) []interface{} {
 }
 
 func (entity *SFind) PointToModel(result interface{}, maxColumns int, options types.QueryOptions) reflect.Value {
-	var log = logger.Logger{"DB FIND"}
+	var log = logger.Logger{Context: "DB FIND"}
 
 	modelPointer := converter.GenerateModelPointer(entity.Model)
 	pointers := entity.generatePointers(modelPointer, maxColumns)
@@ -74,7 +75,9 @@ func (entity *SFind) PointToModel(result interface{}, maxColumns int, options ty
 	}
 
 	if err != nil {
-		log.Error("scan error", err)
+		if err.Error() != dbError.NO_ROWS {
+			log.Error("scan error", err)
+		}
 		return modelPointer
 	}
 

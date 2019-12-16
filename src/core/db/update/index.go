@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-var log = logger.Logger{"DB UPDATE"}
+var log = logger.Logger{Context: "DB UPDATE"}
 
 type SUpdate struct {
 	Name  string

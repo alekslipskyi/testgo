@@ -12,7 +12,7 @@ type SDrop struct {
 	Name string
 }
 
-var log = logger.Logger{"DROP QUERY"}
+var log = logger.Logger{Context: "DROP QUERY"}
 
 func (entity *SDrop) Drop(options types.QueryOptions) bool {
 	query := fmt.Sprintf("delete from %s where %s", entity.Name, converter.DataToQueryString(options.Where, "=", "and"))

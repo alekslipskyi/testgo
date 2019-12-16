@@ -25,7 +25,7 @@ func (channel *Channel) Drop() bool {
 
 func FindChannels(userId int64) []Channel {
 	var channels []Channel
-	log := logger.Logger{" find channel with custom query "}
+	log := logger.Logger{Context: " find channel with custom query "}
 
 	query := fmt.Sprintf(`
 		select *, (select array_agg(user_id) from channel_users where channel_id=_id)
@@ -33,7 +33,7 @@ func FindChannels(userId int64) []Channel {
 		where %d = ANY (select unnest(array_agg(user_id)) from channel_users where channel_id=_id)
 	`, userId)
 
-	log.Log("query are", query)
+	log.Debug("query are", query)
 
 	rows, err := connect.DB.Query(query)
 
@@ -67,6 +67,10 @@ func Find(options types.QueryOptions) []Channel {
 	}
 
 	return listResult
+}
+
+func FindOnlyChannel(where types.Where) Channel {
+	return getInstance().Find(types.QueryOptions{Where: where, Attributes: types.Attributes{"name", "_id"}}).(Channel)
 }
 
 func FindOne(options types.QueryOptions) Channel {

@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-var log = logger.Logger{"controller AUTH"}
+var log = logger.Logger{Context: "controller AUTH"}
 
 type Controller struct{}
 
@@ -25,8 +25,6 @@ func (controller *Controller) handleAuth(ctx Router.Context) {
 		ctx.Reject(requestError.INVALID_CREDENTIAL)
 		return
 	}
-
-	log.Log("user", user)
 
 	helpers.OmitPrivateFields(&user)
 	if user.IsIPNotExist(ctx.RequestIP) {

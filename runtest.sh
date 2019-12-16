@@ -1,1 +1,1 @@
-runner_test "clear && go test ./tests/*.go" ./ .go,.json --config="./src/config/test.json"
+runner_test "clear && go test -v ./tests/*.go" ./ .go,.json --config="./src/config/test.json"

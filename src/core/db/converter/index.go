@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var log = logger.Logger{"DB CONVERTER"}
+var log = logger.Logger{Context: "DB CONVERTER"}
 
 func ParseData(data map[string]interface{}) ([]string, []string) {
 	var values []string

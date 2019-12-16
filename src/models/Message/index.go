@@ -25,6 +25,15 @@ func Find(query types.QueryOptions) []Message {
 	return messages
 }
 
+func Create(channelID int64, userID int64, payload map[string]interface{}) {
+	_, _ = getInstance().Create(map[string]interface{}{
+		"channel_id": channelID,
+		"user_id":    userID,
+		"file_url":   payload["fileURL"],
+		"body":       payload["body"],
+	})
+}
+
 func getInstance() *db.Instance {
 	return &db.Instance{"messages", &Message{}}
 }

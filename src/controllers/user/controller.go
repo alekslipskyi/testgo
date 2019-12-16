@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-var log = logger.Logger{"user controller"}
+var log = logger.Logger{Context: "user controller"}
 
 type Controller struct {
 	db struct {

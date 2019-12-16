@@ -11,7 +11,7 @@ import (
 
 type Controller struct{}
 
-var log = logger.Logger{"Controller list"}
+var log = logger.Logger{Context: "Controller list"}
 
 func (controller *Controller) getListById(ctx Router.Context) List.List {
 	id, _ := strconv.ParseInt(ctx.Params["id"].(string), 10, 64)
@@ -42,7 +42,6 @@ func (controller *Controller) get(ctx Router.Context) {
 }
 
 func (controller *Controller) delete(ctx Router.Context) {
-	log.Log("hello")
 	list := controller.getListById(ctx)
 
 	status := list.Drop()

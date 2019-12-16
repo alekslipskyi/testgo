@@ -28,3 +28,9 @@ func (conn *Controller) Get(ctx Router.Context) {
 
 	ctx.SendJson(messages, http.StatusOK)
 }
+
+func (conn *Controller) Create(ctx Router.Context) {
+	Message.Create(ctx.Params["ChannelID"].(int64), ctx.User.ID, ctx.Body)
+
+	ctx.Send("ok", http.StatusOK)
+}

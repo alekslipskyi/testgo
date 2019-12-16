@@ -16,7 +16,7 @@ var Dbinfo = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 	os.Getenv("DB_NAME"))
 
 func Init() {
-	log := logger.Logger{"Connect"}
+	log := logger.Logger{Context: "Connect"}
 
 	log.Debug("Connect to: ", Dbinfo)
 
