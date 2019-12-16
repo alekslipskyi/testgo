@@ -83,6 +83,8 @@ func getInstance(name ...string) *db.Instance {
 func FindWithIP(ip string, userId int64) User {
 	rows, err := connect.DB.Query("select u._id from users u left join ip_users iu on u._id = iu.user_id where iu.ip = $1 and _id=$2", ip, userId)
 
+	defer rows.Close()
+
 	if err != nil {
 		log.Error("error FindWithIP query", err)
 		return User{}

@@ -61,6 +61,8 @@ func castToString(val interface{}) string {
 	switch val.(type) {
 	case int64:
 		return strconv.FormatInt(val.(int64), 10)
+	case int:
+		return strconv.FormatInt(int64(val.(int)), 10)
 	case bool:
 		return strconv.FormatBool(val.(bool))
 	case float64:

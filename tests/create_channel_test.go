@@ -5,7 +5,6 @@ import (
 	"constants/requestError"
 	"core/db/connect"
 	"core/db/types"
-	"core/logger"
 	. "github.com/smartystreets/goconvey/convey"
 	"helpers/errors"
 	"models/Channel"
@@ -14,8 +13,6 @@ import (
 )
 
 func TestCreateChannelSpec(t *testing.T) {
-	var log = logger.Logger{Context: "create channel tests", Colors: logger.Colors{Info: logger.GREEN}}
-
 	Convey("Create channel tests", t, func() {
 		connect.DB.Exec("delete from users")
 		connect.DB.Exec("delete from channels")
@@ -28,7 +25,7 @@ func TestCreateChannelSpec(t *testing.T) {
 		})
 
 		Convey("Create channel request should create channel and return it", func() {
-			log.Info("Create channel request should create channel and return it")
+
 			res, responseBody := requester.POST(map[string]interface{}{
 				"name": "test",
 			})
@@ -48,7 +45,7 @@ func TestCreateChannelSpec(t *testing.T) {
 		})
 
 		Convey("Create channel without name should return bad request with error \"name is required\"", func() {
-			log.Info("Create channel without name should return bad request with error \"name is required\"")
+
 			res, responseBody := requester.POST(map[string]interface{}{})
 
 			createdChannel := Channel.FindOne(types.QueryOptions{Where: types.Where{"name": "test"}, Attributes: types.Attributes{"_id"}})
@@ -62,7 +59,7 @@ func TestCreateChannelSpec(t *testing.T) {
 		})
 
 		Convey("Create channel with additional field should return bad request with error \"test1 is not allowed\"", func() {
-			log.Info("Create channel with additional field should return bad request with error \"test1 is not allowed\"")
+
 			res, responseBody := requester.POST(map[string]interface{}{
 				"name":  "test",
 				"test1": "test2",
@@ -79,7 +76,7 @@ func TestCreateChannelSpec(t *testing.T) {
 		})
 
 		Convey("Create channel without auth header should return UNAUTHORIZED error", func() {
-			log.Info("Create channel without auth header should return UNAUTHORIZED error")
+
 			requester.UnsetAuth()
 			res, responseBody := requester.POST(map[string]interface{}{
 				"name": "test",

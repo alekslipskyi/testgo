@@ -5,7 +5,6 @@ import (
 	"constants/requestError"
 	"core/crypto"
 	"core/db/connect"
-	"core/logger"
 	. "github.com/smartystreets/goconvey/convey"
 	"models/User"
 	"net/http"
@@ -14,7 +13,6 @@ import (
 
 func TestGettingMeSpec(t *testing.T) {
 	Convey("Test getting me spec", t, func() {
-		var log = logger.Logger{Context: "getting user me tests", Colors: logger.Colors{Info: logger.GREEN}}
 		connect.DB.Exec("delete from users")
 
 		createdUser := User.CreateAndFind(map[string]interface{}{
@@ -30,7 +28,7 @@ func TestGettingMeSpec(t *testing.T) {
 		requester.Init("/api/v0/user", map[string]interface{}{})
 
 		Convey("Getting me should return my user data", func() {
-			log.Info("Getting me should return my user data")
+
 			requester.SetAuth(createdUser.Token)
 			res, responseBody := requester.GET()
 
@@ -46,7 +44,7 @@ func TestGettingMeSpec(t *testing.T) {
 		})
 
 		Convey("Getting me without auth header should return UNAUTHORIZED error", func() {
-			log.Info("Getting me without auth header should return UNAUTHORIZED error")
+
 			res, responseBody := requester.GET()
 
 			So(res.StatusCode, ShouldEqual, http.StatusUnauthorized)
@@ -54,7 +52,7 @@ func TestGettingMeSpec(t *testing.T) {
 		})
 
 		Convey("Getting me with auth header but unauthorized ip should return WRONG_IP error", func() {
-			log.Info("Getting me with auth header but unauthorized ip should return WRONG_IP error")
+
 			requester.SetHeader("Authorization", createdUser.Token)
 			requester.SetHeader("X-Real-IP", "127.0.0.2")
 			res, responseBody := requester.GET()
@@ -64,7 +62,7 @@ func TestGettingMeSpec(t *testing.T) {
 		})
 
 		Convey("Getting me with fake auth header should return UNAUTHORIZED error", func() {
-			log.Info("Getting me with fake auth header should return UNAUTHORIZED error")
+
 			requester.SetHeader("Authorization", "fake")
 			requester.SetHeader("X-Real-IP", "127.0.0.2")
 			res, responseBody := requester.GET()

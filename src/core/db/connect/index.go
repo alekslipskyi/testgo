@@ -25,5 +25,7 @@ func Init() {
 		panic(err)
 	}
 
+	connection.SetMaxOpenConns(80)
+
 	DB = connection
 }

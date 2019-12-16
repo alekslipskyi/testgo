@@ -4,7 +4,6 @@ import (
 	"./utils"
 	"controllers/channel"
 	"core/db/connect"
-	"core/logger"
 	"fmt"
 	. "github.com/smartystreets/goconvey/convey"
 	"helpers/errors"
@@ -14,7 +13,6 @@ import (
 
 func TestInviteToChannelSpec(t *testing.T) {
 	Convey("Test invite to channel", t, func() {
-		var log = logger.Logger{Context: "inviting channel tests", Colors: logger.Colors{Info: logger.GREEN}}
 		connect.DB.Exec("delete from users")
 
 		createdUser := utils.CreateUser()
@@ -26,7 +24,7 @@ func TestInviteToChannelSpec(t *testing.T) {
 		})
 
 		Convey("Invite user to channel should be successful", func() {
-			log.Info("Invite user to channel should be successful")
+
 
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
@@ -37,7 +35,7 @@ func TestInviteToChannelSpec(t *testing.T) {
 		})
 
 		Convey("Invite user to channel without needed permission should be failed with error BAD_PERMISSION_INVITE", func() {
-			log.Info("Invite user to channel without needed permission should be failed with error BAD_PERMISSION_INVITE")
+
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rwdu")
@@ -48,7 +46,7 @@ func TestInviteToChannelSpec(t *testing.T) {
 		})
 
 		Convey("Invite user to channel with wrong userID should be failed and return error\"userID must be a number\"", func() {
-			log.Info("Invite user to channel with wrong userID should be failed and return error\"userID must be a number\"")
+
 			res, responseBody := requester.PUT(fmt.Sprintf("%s/invite/%d", "test", 12))
 
 			So(res.StatusCode, ShouldEqual, http.StatusBadRequest)

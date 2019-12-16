@@ -8,6 +8,7 @@ import (
 	"core/db/types"
 	"core/logger"
 	. "github.com/smartystreets/goconvey/convey"
+	"helpers/errors"
 	"models/Channel"
 	"net/http"
 	"testing"
@@ -29,11 +30,10 @@ func TestDeleteChannelSpec(t *testing.T) {
 		})
 
 		Convey("Delete created channel should delete channel and return message\"ok\"", func() {
-			log.Info("Delete created channel should delete channel and return message\"ok\"")
+
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rwd")
-			requester.Debug()
 			res, _ := requester.DELETE(channelID)
 
 			So(res.StatusCode, ShouldEqual, http.StatusOK)
@@ -42,23 +42,30 @@ func TestDeleteChannelSpec(t *testing.T) {
 			So(channel.IsExist(), ShouldBeFalse)
 		})
 
-		Convey("Delete created channel with params as string should return NOT_FOUND error", func() {
-			log.Info("Delete created channel with params as string should return NOT_FOUND error")
+		Convey("Delete created channel with params as string should return \"channelID must be a number\" error", func() {
+
 			utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rwd")
 			res, responseBody := requester.DELETE("test")
 
-			So(res.StatusCode, ShouldEqual, http.StatusNotFound)
-			So(responseBody, ShouldResemble, utils.StructToMap(requestError.NOT_FOUND))
+			So(res.StatusCode, ShouldEqual, http.StatusBadRequest)
+
+			expectedError := errors.IRequestError{
+				StatusCode: http.StatusBadRequest,
+				Message:    "channelID must be a number",
+				Token:      "NOT_VALID",
+			}
+
+			So(responseBody, ShouldResemble, utils.StructToMap(expectedError))
 
 			channel := Channel.FindOnlyChannel(types.Where{"name": "test"})
-			So(channel.IsExist(), ShouldBeFalse)
+			So(channel.IsExist(), ShouldBeTrue)
 		})
 
 		Convey("Delete not existed channel should return NOT_FOUND error", func() {
 			log.Debug("1")
-			log.Info("Delete not existed channel should return NOT_FOUND error")
+
 			utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rwd")
@@ -70,11 +77,11 @@ func TestDeleteChannelSpec(t *testing.T) {
 			log.Debug("3")
 
 			channel := Channel.FindOnlyChannel(types.Where{"name": "test"})
-			So(channel.IsExist(), ShouldBeFalse)
+			So(channel.IsExist(), ShouldBeTrue)
 		})
 
 		Convey("Delete created channel by another user should return NOT_FOUND error", func() {
-			log.Info("Delete created channel by another user should return NOT_FOUND error")
+
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser2.ID, "rwd")
@@ -84,11 +91,11 @@ func TestDeleteChannelSpec(t *testing.T) {
 			So(responseBody, ShouldResemble, utils.StructToMap(requestError.NOT_FOUND))
 
 			channel := Channel.FindOnlyChannel(types.Where{"name": "test"})
-			So(channel.IsExist(), ShouldBeFalse)
+			So(channel.IsExist(), ShouldBeTrue)
 		})
 
 		Convey("Delete created channel without such permissions should return NOT_ALLOWED error", func() {
-			log.Info("Delete created channel without such permissions should return NOT_ALLOWED error")
+
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rw")
@@ -98,11 +105,11 @@ func TestDeleteChannelSpec(t *testing.T) {
 			So(responseBody, ShouldResemble, utils.StructToMap(channelController.NOT_ALLOWED_TO_DROP))
 
 			channel := Channel.FindOnlyChannel(types.Where{"name": "test"})
-			So(channel.IsExist(), ShouldBeFalse)
+			So(channel.IsExist(), ShouldBeTrue)
 		})
 
 		Convey("Delete created channel without auth header should return UNAUTHORIZED error", func() {
-			log.Info("Delete created channel without auth header should return UNAUTHORIZED error")
+
 			requester.UnsetAuth()
 			utils.CreateChannel(map[string]interface{}{
 				"name": "test",
@@ -113,7 +120,7 @@ func TestDeleteChannelSpec(t *testing.T) {
 			So(responseBody, ShouldResemble, utils.StructToMap(requestError.UNAUTHORIZED))
 
 			channel := Channel.FindOnlyChannel(types.Where{"name": "test"})
-			So(channel.IsExist(), ShouldBeFalse)
+			So(channel.IsExist(), ShouldBeTrue)
 		})
 
 		Reset(func() {

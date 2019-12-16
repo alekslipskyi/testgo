@@ -23,7 +23,7 @@ func getUserFromToken(token string) (bool, User.Token) {
 	decodedJson := crypto.DecodeToken(decodedToken)
 
 	if err := json.Unmarshal(decodedJson, &Json); err != nil {
-		log.Error("Error from decode token", err)
+		log.Warn("Error from decode token", err)
 
 		return false, User.Token{}
 	}
