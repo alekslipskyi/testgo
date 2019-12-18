@@ -2,7 +2,6 @@ package channel
 
 import (
 	"constants/dbError"
-	"constants/permissions"
 	"constants/requestError"
 	"core/Router"
 	"core/db"
@@ -74,11 +73,6 @@ func (entity *Controller) drop(ctx Router.Context) {
 		return
 	}
 
-	if !channelUser.HasPermission(permissions.DROP) {
-		ctx.Reject(NOT_ALLOWED_TO_DROP)
-		return
-	}
-
 	channel := Channel.FindOne(types.QueryOptions{
 		Attributes: types.Attributes{"_id"},
 		Where:      types.Where{"_id": ctx.Params["channelID"]},
@@ -100,13 +94,6 @@ func (entity *Controller) drop(ctx Router.Context) {
 }
 
 func (entity *Controller) invite(ctx Router.Context) {
-	currentUser := ChannelUsers.FindOne(ctx.User.ID, ctx.Params["channelID"].(int64))
-
-	if !currentUser.HasPermission(permissions.INVITE) {
-		ctx.Reject(NOT_ALLOWED_TO_INVITE)
-		return
-	}
-
 	channelUser := ChannelUsers.FindOne(ctx.Params["userID"].(int64), ctx.Params["channelID"].(int64))
 
 	if channelUser.IsExist() {

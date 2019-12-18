@@ -1,12 +1,15 @@
 package helpers
 
 import (
-	channel2 "controllers/channel"
+	"constants/requestError"
 	"core/Router"
 	dbTypes "core/db/types"
+	"core/logger"
 	"models/ChannelUsers"
 	"reflect"
 )
+
+var log = logger.Logger{Context:"Helpers"}
 
 func OmitPrivateFields(obj interface{}) {
 	svPTR := reflect.ValueOf(obj).Elem()
@@ -25,18 +28,18 @@ func OmitPrivateFields(obj interface{}) {
 	}
 }
 
-func HasPermissions(permission rune, error interface{}) func(ctx Router.Context) (bool, interface{}, interface{}) {
-	return func(ctx Router.Context) (bool, interface{}, interface{}) {
+func HasPermissions(permission rune, error interface{}) func(ctx *Router.Context) (bool, interface{}, interface{}) {
+	return func(ctx *Router.Context) (bool, interface{}, interface{}) {
 		channel := ChannelUsers.Find(dbTypes.QueryOptions{
-			Where: map[string]interface{}{"channel_id": ctx.Params["ChannelID"].(int64), "user_id": ctx.User.ID},
+			Where: map[string]interface{}{"channel_id": ctx.Params["channelID"].(int64), "user_id": ctx.User.ID},
 		})
 
 		if !channel.IsExist() {
-			return false, channel2.CHANNEL_NOT_FOUND, nil
+			return false, nil, requestError.NOT_FOUND
 		}
 
 		if !channel.HasPermission(permission) {
-			return false, error, nil
+			return false, nil, error
 		}
 
 		return true, "ok", nil

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"constants/dbError"
 	"fmt"
 	"os"
 	"strings"
@@ -75,7 +76,7 @@ func (logger *Logger) Error(data ...interface{}) {
 }
 
 func (logger *Logger) LogOnError(err error, message ...interface{}) {
-	if err != nil {
+	if err != nil && err.Error() != dbError.NO_ROWS {
 		logger.Error(message)
 	}
 }

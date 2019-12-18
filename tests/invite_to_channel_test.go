@@ -24,8 +24,6 @@ func TestInviteToChannelSpec(t *testing.T) {
 		})
 
 		Convey("Invite user to channel should be successful", func() {
-
-
 			channelID := utils.CreateChannel(map[string]interface{}{
 				"name": "test",
 			}, createdUser.ID, "rwdui")

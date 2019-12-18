@@ -28,8 +28,6 @@ func TestSpec(t *testing.T) {
 		createdUser.GenerateToken()
 
 		Convey("Login with right credentials should be successful and return a user object", func() {
-
-
 			res, responseBody := requester.GET(fmt.Sprintf("/token?username=%s&password=%s", "string", "string"))
 
 			expectedBody := map[string]interface{}{

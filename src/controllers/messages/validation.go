@@ -6,11 +6,11 @@ import (
 )
 
 var checkGetMessagesParams = validation.MustBe{
-	"ChannelID": types.Number{Min: 1},
+	"channelID": types.Number{Min: 1},
 }
 
 var checkCreateMessageParams = validation.MustBe{
-	"ChannelID": types.Number{Min: 1},
+	"channelID": types.Number{Min: 1},
 }
 
 var checkCreateMessageBody = validation.MustBeOneOf{

@@ -3,6 +3,7 @@ package utils
 import (
 	"../../src"
 	"bytes"
+	"core/logger"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -18,10 +19,22 @@ type Requester struct {
 	isDebug bool
 }
 
+var log = logger.Logger{Context:"Requester"}
+
 func (req *Requester) Init(prefix string, headers map[string]interface{}) {
 	srv := httptest.NewServer(router.Handler())
 	req.prefix = srv.URL + prefix
 	req.headers = headers
+}
+
+func InitRequester(prefix string, headers map[string]interface{}) Requester {
+	srv := httptest.NewServer(router.Handler())
+
+	return Requester{
+		prefix:  srv.URL + prefix,
+		headers: headers,
+		isDebug: false,
+	}
 }
 
 func (req *Requester) ChangeParams(providedParams map[string]interface{}) {
@@ -55,7 +68,10 @@ func (req *Requester) DELETE(params ...interface{}) (*http.Response, interface{}
 }
 
 func (req *Requester) POST(params ...interface{}) (*http.Response, interface{}) {
-	if len(params) != 0 && reflect.TypeOf(params[0]) == reflect.TypeOf("") {
+	if len(params) != 0 &&
+		(reflect.TypeOf(params[0]).Kind() == reflect.String ||
+		 reflect.TypeOf(params[0]).Kind() == reflect.Float64 ||
+		 reflect.TypeOf(params[0]).Kind() == reflect.Int) {
 		return req.exec(params[0], "POST", req.getPayload(params[1]))
 	} else {
 		return req.exec("", "POST", req.getPayload(params[0]))

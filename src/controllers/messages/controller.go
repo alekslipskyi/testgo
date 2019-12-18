@@ -27,7 +27,7 @@ func (conn *Controller) Get(ctx Router.Context) {
 		}},
 		Where: types.Where{
 			"user_id":    ctx.User.ID,
-			"channel_id": ctx.Params["ChannelID"].(int64),
+			"channel_id": ctx.Params["channelID"].(int64),
 		},
 		AS: "messages",
 	})
@@ -49,9 +49,9 @@ func (conn *Controller) Update(ctx Router.Context) {
 }
 
 func (conn *Controller) Create(ctx Router.Context) {
-	Message.Create(ctx.Params["ChannelID"].(int64), ctx.User.ID, ctx.Body)
+	Message.Create(ctx.Params["channelID"].(int64), ctx.User.ID, ctx.Body)
 
-	userIDS := ChannelUsers.GetUserIDS(ctx.Params["ChannelID"].(int64))
+	userIDS := ChannelUsers.GetUserIDS(ctx.Params["channelID"].(int64))
 
 	broker.SendMessage(os.Getenv("QUEUE_MESSAGE"), map[string]interface{} {
 		"type": "messages",
@@ -61,5 +61,5 @@ func (conn *Controller) Create(ctx Router.Context) {
 		},
 	})
 
-	ctx.Send("ok", http.StatusOK)
+	ctx.Send("ok", http.StatusCreated)
 }
