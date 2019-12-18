@@ -6,6 +6,7 @@ import (
 	"core/db/find"
 	"core/db/types"
 	"core/db/update"
+	"database/sql"
 )
 
 type Instance struct {
@@ -16,6 +17,11 @@ type Instance struct {
 func (entity *Instance) Find(options types.QueryOptions) interface{} {
 	findInstance := find.SFind{entity.Name, entity.Model}
 	return findInstance.FindOne(options)
+}
+
+func (entity *Instance) FindCustom(options types.QueryOptions) *sql.Rows {
+	findInstance := find.SFind{entity.Name, entity.Model}
+	return findInstance.FindCustom(options)
 }
 
 func (entity *Instance) FindMany(options types.QueryOptions) []interface{} {

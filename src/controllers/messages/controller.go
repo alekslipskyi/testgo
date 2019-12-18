@@ -1,11 +1,17 @@
 package messages
 
 import (
+	"constants/requestError"
 	"core/Router"
+	"core/amqp"
 	"core/db/types"
+	"models/ChannelUsers"
 	"models/Message"
 	"net/http"
+	"os"
 )
+
+var broker = amqp.Init()
 
 type Controller struct {
 }
@@ -29,8 +35,31 @@ func (conn *Controller) Get(ctx Router.Context) {
 	ctx.SendJson(messages, http.StatusOK)
 }
 
+func (conn *Controller) Update(ctx Router.Context) {
+	message := Message.FindByID(ctx.Params["messageID"].(int64))
+
+	if !message.IsExist() {
+		ctx.Reject(requestError.NOT_FOUND)
+		return
+	}
+
+	message.Update(ctx.Body)
+
+	ctx.Send("ok", http.StatusOK)
+}
+
 func (conn *Controller) Create(ctx Router.Context) {
 	Message.Create(ctx.Params["ChannelID"].(int64), ctx.User.ID, ctx.Body)
+
+	userIDS := ChannelUsers.GetUserIDS(ctx.Params["ChannelID"].(int64))
+
+	broker.SendMessage(os.Getenv("QUEUE_MESSAGE"), map[string]interface{} {
+		"type": "messages",
+		"toUsers": userIDS,
+		"data": map[string]interface{} {
+			"message": ctx.Body,
+		},
+	})
 
 	ctx.Send("ok", http.StatusOK)
 }

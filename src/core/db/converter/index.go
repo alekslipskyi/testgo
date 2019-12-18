@@ -26,9 +26,12 @@ func ParseData(data map[string]interface{}) ([]string, []string) {
 			values = append(values, strconv.FormatBool(value.(bool)))
 		default:
 			values = append(values, fmt.Sprintf("'%s'", strings.ToLower(value.(string))))
+		case nil:
 		}
 
-		keys = append(keys, strings.ToLower(key))
+		if value != nil {
+			keys = append(keys, strings.ToLower(key))
+		}
 	}
 
 	log.Debug("finally values -> ", values)

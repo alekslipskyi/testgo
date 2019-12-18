@@ -22,7 +22,7 @@ func (entity *SUpdate) Update(data map[string]interface{}, where types.Where) bo
 
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s", entity.Name, valuesToUpdate, whereConverted)
 	log.Debug("query:", query)
-	connect.DB.QueryRow(query)
+	connect.DB.QueryRow(query).Scan()
 	return true
 }
 

@@ -1,7 +1,9 @@
 package channel
 
 import (
+	"constants/permissions"
 	"core/Router"
+	"helpers"
 	"helpers/auth"
 )
 
@@ -14,5 +16,9 @@ func Routes() {
 
 	router.GET("/", controller.index, auth.IsAuthenticated)
 	router.POST("/", controller.create, auth.IsAuthenticated, bodyChannelCreate)
-	router.PUT("/{userID}/invite/{channelID}", controller.invite, auth.IsAuthenticated, paramsChannelInvite)
+	router.PUT("/{userID}/invite/{channelID}", controller.invite,
+		auth.IsAuthenticated,
+		helpers.HasPermissions(permissions.INVITE, NOT_ALLOWED_TO_INVITE),
+		paramsChannelInvite,
+	)
 }

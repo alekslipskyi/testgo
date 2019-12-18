@@ -33,6 +33,20 @@ func (entity *SFind) FindOne(options types.QueryOptions) interface{} {
 	return result
 }
 
+func (entity *SFind) FindCustom(options types.QueryOptions) *sql.Rows {
+	var log = logger.Logger{Context: "DB FIND CUSTOM"}
+
+	sqlQuery, attributes := entity.generateQuery(options)
+
+	query := fmt.Sprintf(sqlQuery, attributes, entity.Name)
+	log.Debug("query:", query)
+
+	rows, err := connect.DB.Query(query)
+	log.LogOnError(err, "error from custom query")
+
+	return rows
+}
+
 func (entity *SFind) FindMany(options types.QueryOptions) []interface{} {
 	var log = logger.Logger{Context: "DB FIND MANY"}
 

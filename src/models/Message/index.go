@@ -13,6 +13,18 @@ type Message struct {
 	Channelid int64                  `json:"channel_id,omitempty"`
 }
 
+func (mess *Message) IsExist() bool {
+	return mess.ID != 0
+}
+
+func (mess *Message) Update(data map[string]interface{}) {
+	getInstance().Update(data, types.Where{"_id": mess.ID})
+}
+
+func FindByID(messageID int64) Message {
+	return getInstance().FindById(messageID, []string{"_id"}).(Message)
+}
+
 func Find(query types.QueryOptions) []Message {
 	result := getInstance().FindMany(query)
 

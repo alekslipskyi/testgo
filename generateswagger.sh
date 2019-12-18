@@ -1,0 +1,1 @@
+swagger generate spec -i="./swagger.yml" -o="./src/lib/swagger-ui/dist/swagger.json"

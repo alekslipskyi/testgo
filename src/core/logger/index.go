@@ -22,7 +22,7 @@ const (
 	WarningColor = YELLOW
 	ErrorColor   = RED
 	DebugColor   = WHITE
-	LogColor     = WHITE
+	LogColor     = GREEN
 )
 
 type Colors struct {
@@ -55,7 +55,7 @@ func (logger *Logger) Warn(data ...interface{}) {
 			color = logger.Colors.Warn
 		}
 
-		fmt.Println(fmt.Sprintf("%s[%s] error:%s%s", color, strings.ToUpper(logger.Context), fmt.Sprint(data...), "\033[0m"))
+		fmt.Println(fmt.Sprintf("%s[%s] warning: %s%s", color, strings.ToUpper(logger.Context), fmt.Sprint(data...), "\033[0m"))
 	}
 }
 

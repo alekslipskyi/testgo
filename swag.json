@@ -1,6 +1,0 @@
-{
-  "exec": "swagger generate spec -i=\"./swagger.yml\" -o=\"./src/lib/swagger-ui/dist/swagger.json\"",
-  "watchfile":  "./swagger.yml",
-  "config": "./src/config/development.json",
-  "foreground": true
-}

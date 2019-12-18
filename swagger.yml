@@ -210,6 +210,30 @@ paths:
           description: error
           schema:
             $ref: "#/definitions/error"
+  /message/{channelID}:
+    post:
+      tags: ["Messages"]
+      security:
+        - Bearer: []
+      parameters:
+        - name: channelID
+          in: path
+          schema:
+            type: number
+        - name: info
+          in: body
+          schema:
+            $ref: "#/definitions/messageToCreate"
+      operationId: create_message
+      summary: create a message
+      responses:
+        responses:
+          '200':
+            description: 'ok'
+          default:
+            description: error
+            schema:
+              $ref: "#/definitions/error"
   /message/{channelID}/messages:
     get:
       tags: ["Messages"]
@@ -362,6 +386,13 @@ definitions:
         type: string
         format: string
         minLength: 1
+  messageToCreate:
+    type: object
+    properties:
+      body:
+        type: string
+        format: string
+        default: string
   channelToCreate:
     type: object
     properties:
