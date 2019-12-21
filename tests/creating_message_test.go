@@ -14,6 +14,7 @@ import (
 
 func TestCreatingMessageSpec(t *testing.T) {
 	connect.Init()
+	defer connect.DB.Close()
 
 	Convey("Creating message tests", t, func() {
 		connect.DB.Exec("delete from users")
@@ -28,7 +29,7 @@ func TestCreatingMessageSpec(t *testing.T) {
 		})
 
 		Convey("Creating message should create a message and return message \"ok\"", func() {
-			res, _ := requester.POST(channelID, map[string]interface{} {
+			res, _ := requester.POST(channelID, map[string]interface{}{
 				"body": "hello",
 			})
 
@@ -42,7 +43,7 @@ func TestCreatingMessageSpec(t *testing.T) {
 		})
 
 		Convey("Creating message in channel which is not exist should return NOT_FOUND error", func() {
-			res, responseBody := requester.POST(123, map[string]interface{} {
+			res, responseBody := requester.POST(123, map[string]interface{}{
 				"body": "hello",
 			})
 
@@ -57,7 +58,7 @@ func TestCreatingMessageSpec(t *testing.T) {
 		})
 
 		Convey("Creating message with wrong channel id should return error message \"channelID must be a number\"", func() {
-			res, responseBody := requester.POST("hello", map[string]interface{} {
+			res, responseBody := requester.POST("hello", map[string]interface{}{
 				"body": "hello",
 			})
 
@@ -79,7 +80,7 @@ func TestCreatingMessageSpec(t *testing.T) {
 		})
 
 		Convey("Creating message with wrong body return error message \"body must be a string\"", func() {
-			res, responseBody := requester.POST(channelID, map[string]interface{} {
+			res, responseBody := requester.POST(channelID, map[string]interface{}{
 				"body": 123,
 			})
 

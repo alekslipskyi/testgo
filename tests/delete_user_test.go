@@ -12,6 +12,9 @@ import (
 )
 
 func TestDeleteUserSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Delete user Test", t, func() {
 		connect.DB.Exec("delete from users")
 
@@ -19,7 +22,6 @@ func TestDeleteUserSpec(t *testing.T) {
 		requester.Init("/api/v0/user", map[string]interface{}{})
 
 		Convey("Delete user should be successful and return ok", func() {
-
 
 			createdUser := utils.CreateUser()
 			requester.SetAuth(createdUser.Token)

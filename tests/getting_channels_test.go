@@ -10,6 +10,9 @@ import (
 )
 
 func TestGettingChannels(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Test getting channels", t, func() {
 		connect.DB.Exec("delete from users")
 

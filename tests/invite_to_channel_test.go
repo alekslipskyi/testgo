@@ -12,6 +12,9 @@ import (
 )
 
 func TestInviteToChannelSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Test invite to channel", t, func() {
 		connect.DB.Exec("delete from users")
 

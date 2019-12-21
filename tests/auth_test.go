@@ -14,6 +14,8 @@ import (
 
 func TestSpec(t *testing.T) {
 	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Auth tests", t, func() {
 		connect.DB.Exec("delete from users")
 		requester := utils.Requester{}

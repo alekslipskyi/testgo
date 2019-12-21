@@ -13,6 +13,9 @@ import (
 )
 
 func TestCreateChannelSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Create channel tests", t, func() {
 		connect.DB.Exec("delete from users")
 		connect.DB.Exec("delete from channels")

@@ -15,9 +15,12 @@ import (
 	"testing"
 )
 
-var log = logger.Logger{Context:"Gettting messages tests"}
+var log = logger.Logger{Context: "Gettting messages tests"}
 
 func TestGettingMessagesSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Getting messages tests", t, func() {
 		connect.DB.Exec("delete from users")
 
@@ -25,7 +28,7 @@ func TestGettingMessagesSpec(t *testing.T) {
 		createdUser1 := utils.CreateUser()
 		createdUser2 := utils.CreateUser("string2")
 
-		channelID, err := Channel.Create(map[string]interface{} {
+		channelID, err := Channel.Create(map[string]interface{}{
 			"name": "test",
 		})
 		log.LogOnError(err, "error from creating channel", err)
@@ -51,12 +54,12 @@ func TestGettingMessagesSpec(t *testing.T) {
 
 			So(res.StatusCode, ShouldEqual, http.StatusOK)
 
-			expectedBody := []interface{} {map[string]interface{}{
-				"body": "test",
-				"id": float64(messageID),
+			expectedBody := []interface{}{map[string]interface{}{
+				"body":       "test",
+				"id":         float64(messageID),
 				"channel_id": float64(channelID),
-				"user": map[string]interface{} {
-					"_id": float64(createdUser1.ID),
+				"user": map[string]interface{}{
+					"_id":      float64(createdUser1.ID),
 					"username": createdUser1.Username,
 				},
 			}}

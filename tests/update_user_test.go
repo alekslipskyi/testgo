@@ -13,6 +13,9 @@ import (
 )
 
 func TestUpdateUserSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Update user tests", t, func() {
 		connect.DB.Exec("delete from users")
 

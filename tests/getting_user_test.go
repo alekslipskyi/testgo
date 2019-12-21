@@ -12,6 +12,9 @@ import (
 )
 
 func TestGettingUserSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Test getting user spec", t, func() {
 		connect.DB.Exec("delete from users")
 

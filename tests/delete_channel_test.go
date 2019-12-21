@@ -15,6 +15,9 @@ import (
 )
 
 func TestDeleteChannelSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	var log = logger.Logger{Context: "Delete channel tests", Colors: logger.Colors{Info: logger.GREEN}}
 
 	Convey("Delete channel tests", t, func() {

@@ -13,6 +13,9 @@ import (
 )
 
 func TestSignUpSpec(t *testing.T) {
+	connect.Init()
+	defer connect.DB.Close()
+
 	Convey("Sign up tests", t, func() {
 		connect.DB.Exec("delete from users")
 
